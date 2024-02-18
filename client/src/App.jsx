@@ -1,11 +1,18 @@
-import "./App.css";
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-function App() {
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
+
+export default function App() {
   return (
-    <div className="App">
-      <h1>Hello world</h1>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Dashboard/>} />
+      </Routes>
+    </BrowserRouter>
   );
 }
-
-export default App;
