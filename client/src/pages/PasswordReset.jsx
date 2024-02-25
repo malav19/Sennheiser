@@ -34,7 +34,7 @@ export default function PasswordReset() {
         toast.success("Password updated successfully!");
         navigate("/login");
       } else {
-        toast.error("Failed to update password. Please try again.");
+        toast.error("Failed to update password. Please try again!.");
       }
     } catch (error) {
       console.error("Error updating password:", error);
