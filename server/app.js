@@ -3,6 +3,10 @@ const mongoose = require("mongoose");
 const morgan = require("morgan");
 const cors = require("cors");
 const authRoutes = require("./routes/auth");
+<<<<<<< HEAD
+=======
+
+>>>>>>> 808dd19a (Committing untracked files before switching branches)
 require("dotenv").config();
 
 const app = express();
