@@ -2,19 +2,13 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import styled from "styled-components";
 import { useNavigate, Link } from "react-router-dom";
-<<<<<<< HEAD
 import Logo from "../assets/vc.png";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { loginRoute } from "../utils/APIRoutes";
-=======
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { loginRoute } from "../utils/APIRoutes";
 import Header from "../components/Login/Header";
 import Button from "../components/Login/Button";
 import Input from "../components/Login/Input";
->>>>>>> master
 
 export default function Login() {
   const navigate = useNavigate();
@@ -26,11 +20,8 @@ export default function Login() {
     draggable: true,
     theme: "dark",
   };
-<<<<<<< HEAD
-  // if user already exists it will redirect to the login page 
-=======
 
->>>>>>> master
+  // if user already exists it will redirect to the login page 
   useEffect(() => {
     if (localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)) {
       navigate("/");
@@ -79,41 +70,26 @@ export default function Login() {
     <>
       <FormContainer>
         <form action="" onSubmit={(event) => handleSubmit(event)}>
-<<<<<<< HEAD
-          <div className="brand">
-            <img src={Logo} alt="logo" />
-            <h1>VIBE CHECK</h1>
-          </div>
-          <input
-=======
           <Header />
           <Input
->>>>>>> master
             type="text"
             placeholder="Username"
             name="username"
             onChange={(e) => handleChange(e)}
             min="3"
           />
-<<<<<<< HEAD
-          <input
-=======
           <Input
->>>>>>> master
             type="password"
             placeholder="Password"
             name="password"
             onChange={(e) => handleChange(e)}
           />
-<<<<<<< HEAD
-          <button type="submit">Log In</button>
-=======
+          
           <span>
             <Link to="/forgot-password">Forgot Password?</Link>
           </span>
-
           <Button type="submit" text="Log In" />
->>>>>>> master
+
           <span>
             Don't have an account ? <Link to="/register">Create One.</Link>
           </span>
@@ -133,7 +109,6 @@ const FormContainer = styled.div`
   gap: 1rem;
   align-items: center;
   background-color: rgb(247 247 251);
-<<<<<<< HEAD
   .brand {
     display: flex;
     align-items: center;
@@ -147,8 +122,6 @@ const FormContainer = styled.div`
       text-transform: uppercase;
     }
   }
-=======
->>>>>>> master
 
   form {
     display: flex;
@@ -158,7 +131,7 @@ const FormContainer = styled.div`
     border-radius: 2rem;
     padding: 5rem;
   }
-<<<<<<< HEAD
+
   input {
     background-color: transparent;
     padding: 1rem;
@@ -186,9 +159,6 @@ const FormContainer = styled.div`
       background-color: #006622;
     }
   }
-=======
-
->>>>>>> master
   span {
     color: black;
     text-transform: uppercase;
