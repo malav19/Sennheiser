@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import styled from "styled-components";
 import { useNavigate, Link } from "react-router-dom";
-import Logo from "../assets/vc.png";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { loginRoute } from "../utils/APIRoutes";
@@ -21,7 +20,6 @@ export default function Login() {
     theme: "dark",
   };
 
-  // if user already exists it will redirect to the login page 
   useEffect(() => {
     if (localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)) {
       navigate("/");
@@ -48,20 +46,26 @@ export default function Login() {
     event.preventDefault();
     if (validateForm()) {
       const { username, password } = values;
-      const { data } = await axios.post(loginRoute, {
-        username,
-        password,
-      });
-      if (data.status === false) {
-        toast.error(data.msg, toastOptions);
-      }
-      if (data.status === true) {
-        localStorage.setItem(
-          process.env.REACT_APP_LOCALHOST_KEY,
-          JSON.stringify(data.user)
-        );
+      if (username === "admin" && password === "admin@1234") {
+        // Navigate to the admin dashboard
+        navigate("/admin");
+      } else {
+        // If not an admin, perform the regular login logic
+        const { data } = await axios.post(loginRoute, {
+          username,
+          password,
+        });
+        if (data.status === false) {
+          toast.error(data.msg, toastOptions);
+        }
+        if (data.status === true) {
+          localStorage.setItem(
+            process.env.REACT_APP_LOCALHOST_KEY,
+            JSON.stringify(data.user)
+          );
 
-        navigate("/");
+          navigate("/");
+        }
       }
     }
   };
@@ -84,7 +88,7 @@ export default function Login() {
             name="password"
             onChange={(e) => handleChange(e)}
           />
-          
+
           <span>
             <Link to="/forgot-password">Forgot Password?</Link>
           </span>
