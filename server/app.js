@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const morgan = require("morgan");
 const cors = require("cors");
 const authRoutes = require("./routes/auth");
+const productRoutes = require("./routes/products");
 require("dotenv").config();
 
 const app = express();
@@ -18,6 +19,7 @@ mongoose
 app.use(morgan("dev"));
 app.use(cors({ origin: true, credentials: true }));
 app.use("/api/auth", authRoutes);
+app.use("/api/product", productRoutes);
 const port = process.env.PORT || 8081;
 
 const server = app.listen(port, () =>
