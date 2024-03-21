@@ -7,6 +7,7 @@ import {
   faHeart,
   faShoppingCart,
 } from "@fortawesome/free-solid-svg-icons";
+
 import Logo from "../../assets/Vibe.png";
 
 const Navbar = () => {
