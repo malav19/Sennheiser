@@ -161,8 +161,8 @@ const ItemWrapper = styled.div`
 `;
 
 const ItemImage = styled.img`
-  width: 150px;
-  height: 150px;
+width: 150px;
+    height: 150px;
   margin-right: 1rem;
 `;
 

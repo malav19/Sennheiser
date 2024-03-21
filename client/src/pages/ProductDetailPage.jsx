@@ -101,10 +101,10 @@ const Container = styled.div`
 `;
 
 const ProductImage = styled.img`
-  flex: 1;
-  max-height: 500px;
-  object-fit: cover;
-  border-radius: 8px;
+flex: 1;
+  max-height: 900px;
+object-fit: cover;
+border-radius: 7px;
 `;
 
 const ProductInfo = styled.div`

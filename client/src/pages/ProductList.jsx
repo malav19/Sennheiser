@@ -96,20 +96,20 @@ const ProductGrid = styled.div`
 
 const ProductCard = styled.div`
   background-color: #ffffff;
-  border-radius: 5px;
+  border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   width: 250px;
-  height: 350px;
+  height: 450px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
 `;
 
 const ProductImage = styled.img`
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
-  border-radius: 5px 5px 0 0;
+width: 100%;
+height: 270px;
+object-fit: cover;
+border-radius: 5px 5px 0 0;
 `;
 
 const ProductDetails = styled.div`
