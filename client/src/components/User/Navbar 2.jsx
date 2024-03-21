@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -10,31 +10,16 @@ import {
 import Logo from "../../assets/Vibe.png";
 
 const Navbar = () => {
-  const navigate = useNavigate();
-
-  const CartIcon = () => {
-    const handleClick = () => {
-      navigate("/cart");
-    };
-
-    return (
-      <IconLink onClick={handleClick}>
-        <IconCircle>
-          <FontAwesomeIcon icon={faShoppingCart} />
-        </IconCircle>
-      </IconLink>
-    );
-  };
-
   return (
     <NavContainer>
+      {/* Insert the audio logo */}
       <LogoContainer>
         <LogoImage src={Logo} alt="Audio Logo" />
       </LogoContainer>
 
       <NavLinkContainer>
         <NavLink to="/">Home</NavLink>
-        <NavLink to="/products">Products</NavLink>
+        <NavLink to="/">Products</NavLink>
         <NavLink to="/">Contact Us</NavLink>
         <NavLink to="/about">About Us</NavLink>
       </NavLinkContainer>
@@ -55,7 +40,11 @@ const Navbar = () => {
             <FontAwesomeIcon icon={faHeart} />
           </IconCircle>
         </IconLink>
-        <CartIcon />
+        <IconLink to="/cart">
+          <IconCircle>
+            <FontAwesomeIcon icon={faShoppingCart} />
+          </IconCircle>
+        </IconLink>
       </IconContainer>
     </NavContainer>
   );
@@ -63,16 +52,16 @@ const Navbar = () => {
 
 const NavContainer = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: column; /* Change to column layout for small screens */
   justify-content: space-between;
   align-items: center;
   background: linear-gradient(to right, #f472b6, #60a5fa);
-  height: auto;
-  padding: 1rem;
+  height: auto; /* Adjusted height for small screens */
+  padding: 1rem; /* Adjusted padding for small screens */
 
   @media (min-width: 768px) {
-    flex-direction: row;
-    height: 15vh;
+    flex-direction: row; /* Switch back to row layout for larger screens */
+    height: 15vh; /* Reset height for larger screens */
   }
 `;
 
@@ -82,8 +71,8 @@ const LogoContainer = styled.div`
 `;
 
 const LogoImage = styled.img`
-  width: 150px;
-  height: auto;
+  width: 150px; // Adjust the width of the logo as needed
+  height: auto; // Maintain the aspect ratio
   margin-right: 1rem;
 `;
 
@@ -145,7 +134,12 @@ const IconCircle = styled.div`
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.7);
+  background-color: rgba(
+    255,
+    255,
+    255,
+    0.7
+  ); /* Adjust the background color and opacity as needed */
 `;
 
 export default Navbar;
