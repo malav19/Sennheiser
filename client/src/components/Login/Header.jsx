@@ -23,7 +23,9 @@ const HeaderContainer = styled.div`
     height: 5rem;
   }
   h1 {
-    color: #00802b;
+    background: linear-gradient(to right, #f472b6, #60a5fa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     text-transform: uppercase;
   }
 `;

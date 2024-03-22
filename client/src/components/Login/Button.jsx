@@ -6,29 +6,20 @@ const Button = ({ type, text }) => {
 };
 
 const StyledButton = styled.button`
-
- 
-  padding: 1rem;
+  padding: 0 2rem;
   border: 0.1rem solid rgb(240 239 243);
   border-radius: 0.4rem;
-  color: black;
+  color: white; /* Text color */
   font-size: 1rem;
-  height: 2.6rem;  
+  height: 2.6rem; /* Button height */
   box-sizing: border-box;
-  background-color: #00802b;
-  color: white;
-  padding: 0 2rem; /* Adjust the padding as needed */
-  border: 0.1rem solid rgb(240 239 243);
+  background: linear-gradient(to right, #f472b6, #60a5fa); /* Linear gradient background color */
   font-weight: bold;
   cursor: pointer;
-  border-radius: 0.4rem;
-  font-size: 1rem;
   text-transform: uppercase;
 
   &:hover {
-    background-color: #006622;
-  }
-   
+    background: linear-gradient(to right, #f472b6, #60a5fa); /* Hover effect */
   }
 `;
 
