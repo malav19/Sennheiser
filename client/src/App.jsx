@@ -12,6 +12,7 @@ import AdminCustomer from "./pages/AdminCustomer";
 import ProductListPage from "./pages/ProductList";
 import ProductDetailPage from "./pages/ProductDetailPage";
 import AddToCart from "./pages/AddToCart";
+import UserProfile from "./pages/UserProfile";
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
         <Route path="/products/*" element={<ProductListPage />} />
         <Route path="/product/:productId" element={<ProductDetailPage />} />
         <Route path="/cart" element={<AddToCart />} />
+        <Route path="/profile" element={<UserProfile />} />
       </Routes>
     </Router>
   );

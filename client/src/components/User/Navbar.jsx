@@ -56,7 +56,12 @@ const Navbar = () => {
             <FontAwesomeIcon icon={faHeart} />
           </IconCircle>
         </IconLink>
-        <CartIcon />
+
+        <IconLink to="/cart">
+          <IconCircle>
+            <FontAwesomeIcon icon={faShoppingCart} />
+          </IconCircle>
+        </IconLink>
       </IconContainer>
     </NavContainer>
   );

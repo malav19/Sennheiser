@@ -1,10 +1,34 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import Navbar from "../components/User/Navbar";
 import img1 from "../assets/wire_earphone.jpeg";
+import AddressModal from "../components/Models/AddressModal";
+import PaymentModal from "../components/Models/PaymentModal";
 
 const AddToCart = () => {
-  // Static product data
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+  const [modalHeaderAddress, setModalHeaderAddress] = useState("");
+
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [modalHeaderPayment, setModalHeaderPayment] = useState("");
+
+  const openAddressModal = (header) => {
+    setModalHeaderAddress(header);
+    setIsAddressModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsAddressModalOpen(false);
+  };
+
+  const openPaymentModal = (header) => {
+    setModalHeaderPayment(header);
+    setIsPaymentModalOpen(true);
+  };
+
+  const handleClosePaymentModal = () => {
+    setIsPaymentModalOpen(false);
+  };
   const products = [
     {
       id: 1,
@@ -16,6 +40,20 @@ const AddToCart = () => {
     {
       id: 2,
       name: "Product Name 2",
+      quantity: 3,
+      price: 25,
+      image: img1,
+    },
+    {
+      id: 3,
+      name: "Product Name 3",
+      quantity: 3,
+      price: 25,
+      image: img1,
+    },
+    {
+      id: 4,
+      name: "Product Name 4",
       quantity: 3,
       price: 25,
       image: img1,
@@ -37,6 +75,7 @@ const AddToCart = () => {
     (acc, product) => acc + product.quantity * product.price,
     0
   );
+
   return (
     <>
       <Navbar />
@@ -45,29 +84,39 @@ const AddToCart = () => {
           <OrderItem>
             <Heading>My Cart</Heading>
             <ThickLine />
-            {products.map((product, index) => (
-              <React.Fragment key={product.id}>
-                <ItemWrapper>
-                  <ItemImage src={product.image} alt="Product" />
-                  <ItemDetails>
-                    <ItemName>{product.name}</ItemName>
-                    <ItemQuantity>Quantity: {product.quantity}</ItemQuantity>
-                    <ItemPrice>Price: ${product.price}</ItemPrice>
-                  </ItemDetails>
-                </ItemWrapper>
-                {index !== products.length - 1 && <ThickLine />}
-              </React.Fragment>
-            ))}
+            <CartContent>
+              {products.map((product, index) => (
+                <React.Fragment key={product.id}>
+                  <ItemWrapper>
+                    <ItemImage src={product.image} alt="Product" />
+                    <ItemDetails>
+                      <ItemName>{product.name}</ItemName>
+                      <ItemQuantity>Quantity: {product.quantity}</ItemQuantity>
+                      <ItemPrice>Price: ${product.price}</ItemPrice>
+                    </ItemDetails>
+                  </ItemWrapper>
+                  {index !== products.length - 1 && <ThickLine />}
+                </React.Fragment>
+              ))}
+            </CartContent>
           </OrderItem>
           <ShippingAddressContainer>
-            <ShippingAddressHeading>Shipping Address</ShippingAddressHeading>
+            <ShippingAddressHeading>Shipping Address:</ShippingAddressHeading>
             <UserName>User Name</UserName>
             <AddressLine>Address Line 1</AddressLine>
             <AddressLine>Address Line 2</AddressLine>
             <AddressLine>Address Line 3</AddressLine>
             <ButtonContainer>
-              <AddAddressButton>Add Address</AddAddressButton>
-              <ChangeAddressButton>Change Address</ChangeAddressButton>
+              <AddAddressButton
+                onClick={() => openAddressModal("Add New Address")}
+              >
+                Add Address
+              </AddAddressButton>
+              <ChangeAddressButton
+                onClick={() => openAddressModal("Update Your Address")}
+              >
+                Change Address
+              </ChangeAddressButton>
             </ButtonContainer>
           </ShippingAddressContainer>
         </OrderListContainer>
@@ -85,6 +134,16 @@ const AddToCart = () => {
                   {maskedCardNumber(paymentMethod.cardNumber)}
                 </PaymentValue>
               </PaymentDetail>
+              <AddPaymentButton
+                onClick={() => openPaymentModal("Add New Payment")}
+              >
+                Add Payment Method
+              </AddPaymentButton>
+              <ChangePaymentButton
+                onClick={() => openPaymentModal("Update Your Payment")}
+              >
+                Change Payment Method
+              </ChangePaymentButton>
             </PaymentContent>
           </PaymentMethodContainer>
           <SpecialInstructionContainer>
@@ -109,12 +168,21 @@ const AddToCart = () => {
             </SpecialInstructionContent>
           </SpecialInstructionContainer>
           <TotalContainer>
-            <TotalHeading>Total:</TotalHeading>
-            <TotalPrice>${total}</TotalPrice>
+            <TotalHeading>Total: ${total}</TotalHeading>
             <ProceedButton>Proceed to Payment</ProceedButton>
           </TotalContainer>
         </PaymentSpecialContainer>
       </Container>
+      <AddressModal
+        isOpen={isAddressModalOpen}
+        onClose={handleCloseModal}
+        headerText={modalHeaderAddress}
+      />
+      <PaymentModal
+        isOpen={isPaymentModalOpen}
+        onClose={handleClosePaymentModal}
+        headerText={modalHeaderPayment}
+      />
     </>
   );
 };
@@ -131,8 +199,6 @@ const OrderListContainer = styled.div`
 `;
 
 const OrderItem = styled.div`
-  display: flex;
-  flex-direction: column;
   border: 1px solid #ccc;
   border-radius: 8px;
   padding: 1rem;
@@ -149,6 +215,11 @@ const ThickLine = styled.div`
   height: 2px;
   background-color: #ccc;
   margin-bottom: 1rem;
+`;
+
+const CartContent = styled.div`
+  height: 400px; /* Set a fixed height */
+  overflow-y: auto; /*  padding-right: 16px; /* Adjust for scrollbar width */
 `;
 
 const ItemWrapper = styled.div`
@@ -240,8 +311,29 @@ const PaymentMethodContainer = styled.div`
   padding: 1rem;
   border: 1px solid #ccc;
   border-radius: 8px;
-  height: 200px;
+  height: auto; /* Remove fixed height */
   overflow-y: auto;
+`;
+
+const AddPaymentButton = styled.button`
+  padding: 0.5rem 1rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+  margin-right: 0.5rem; /* Add right margin */
+`;
+
+const ChangePaymentButton = styled.button`
+  padding: 0.5rem 1rem;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
 `;
 
 const PaymentMethodHeading = styled.h2`
@@ -296,19 +388,15 @@ const SpecialInstructionValue = styled.span`
 `;
 
 const TotalContainer = styled.div`
-  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: left;
   padding: 1rem;
-  width: 100%;
 `;
 
 const TotalHeading = styled.h2`
   font-size: 1.5rem;
   margin-bottom: 1rem;
-`;
-
-const TotalPrice = styled.p`
-  font-size: 1.2rem;
-  font-weight: bold;
 `;
 
 const ProceedButton = styled.button`
@@ -318,7 +406,6 @@ const ProceedButton = styled.button`
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  margin-top: 1rem;
 `;
 
 export default AddToCart;
