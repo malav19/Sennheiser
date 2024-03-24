@@ -2,8 +2,8 @@ import React from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Admin/Sidebar";
-import { FaHome, FaShoppingCart, FaBox, FaUsers } from "react-icons/fa";
-import { Link, useParams } from "react-router-dom";
+
+import { useParams } from "react-router-dom";
 export default function AdminCustomer() {
   const navigate = useNavigate();
   const handleLogout = () => {
@@ -19,33 +19,33 @@ export default function AdminCustomer() {
       amountSpents: "$500",
       totalOrders: 20,
     },
-    
+
     {
-        id: 2,
-        customerName: "Jagraj Kaur",
-        date: "2024-03-03",
-        email: "kaurjagraj@gmail.com",
-        amountSpents: "$1000",
-        totalOrders:20
-      },  
-      {
-        id: 1,
-        customerName: "Malav Patel",
-        date: "2024-03-03",
-        email: "malavpatel@gmail.com",
-        amountSpents: '$500',
-        totalOrders: 20
-      },
-      {
-          id: 2,
-          customerName: "Karanveer Kaur",
-          date: "2024-03-03",
-          email: "karanveer@gmail.com",
-          amountSpents: "$1000",
-          totalOrders:20
-        },
+      id: 2,
+      customerName: "Jagraj Kaur",
+      date: "2024-03-03",
+      email: "kaurjagraj@gmail.com",
+      amountSpents: "$1000",
+      totalOrders: 20,
+    },
+    {
+      id: 1,
+      customerName: "Malav Patel",
+      date: "2024-03-03",
+      email: "malavpatel@gmail.com",
+      amountSpents: "$500",
+      totalOrders: 20,
+    },
+    {
+      id: 2,
+      customerName: "Karanveer Kaur",
+      date: "2024-03-03",
+      email: "karanveer@gmail.com",
+      amountSpents: "$1000",
+      totalOrders: 20,
+    },
     // Add more customers as needed
- ];
+  ];
 
   return (
     <Container>
