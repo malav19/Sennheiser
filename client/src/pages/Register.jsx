@@ -173,7 +173,7 @@ const FormContainer = styled.div`
     }
   }
   button {
-    background-color: #00802b;
+    background: linear-gradient(to right, #f472b6, #60a5fa);
     color: white;
     padding: 1rem 2rem;
     border: 0.1rem solid rgb(240 239 243);
@@ -183,15 +183,15 @@ const FormContainer = styled.div`
     font-size: 1rem;
     text-transform: uppercase;
     &:hover {
-      background-color: #006622;
+      background: linear-gradient(to right, rgb(244, 114, 182), rgb(96, 165, 250));
     }
   }
-
+  
   span {
     color: black;
     text-transform: uppercase;
     a {
-      color: #00802b;
+      color: linear-gradient(to right, rgb(244, 114, 182), rgb(96, 165, 250));
       text-decoration: none;
       font-weight: bold;
     }

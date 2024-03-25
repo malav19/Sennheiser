@@ -47,7 +47,7 @@ export default function PasswordReset() {
       <FormContainer>
         <form onSubmit={handleUpdatePassword}>
           <Header />
-          <label style={{ fontWeight: "bold", fontSize: 16, color: "green" }}>
+          <label style={{ fontWeight: "bold", fontSize: 16, color: "#008eff" }}>
             Update Password:
           </label>
           <Input
@@ -80,13 +80,13 @@ const FormContainer = styled.div`
   justify-content: center;
   gap: 1rem;
   align-items: center;
-  background-color: rgb(247 247 251);
+  background-color: linear-gradient(to right, rgb(244, 114, 182), rgb(96, 165, 250));
 
   form {
     display: flex;
     flex-direction: column;
     gap: 2rem;
-    background-color: #fff;
+    background-color: linear-gradient(to right, rgb(244, 114, 182), rgb(96, 165, 250));
     border-radius: 2rem;
     padding: 5rem;
   }
@@ -95,7 +95,7 @@ const FormContainer = styled.div`
     color: black;
     text-transform: uppercase;
     a {
-      color: #00802b;
+      color: linear-gradient(to right, rgb(244, 114, 182), rgb(96, 165, 250));
       text-decoration: none;
       font-weight: bold;
     }
