@@ -1,15 +1,15 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import Navbar from "../components/User/Navbar";
+import { recieveProductRoute } from "../utils/APIRoutes";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar, faStarHalf } from "@fortawesome/free-solid-svg-icons";
 import img1 from "../assets/wire_earphone.jpeg";
-
+import axios from "axios";
 const StarRating = ({ rating }) => {
   const filledStars = Math.floor(rating);
   const hasHalfStar = rating % 1 !== 0;
-
   const stars = [];
   for (let i = 1; i <= 5; i++) {
     if (i <= filledStars) {
@@ -25,71 +25,84 @@ const StarRating = ({ rating }) => {
 };
 
 const ProductDetailPage = () => {
-  // Fetch the product ID from URL params
+  const [product, setProduct] = useState({});
   const { productId } = useParams();
+  useEffect(() => {
+    getProducts();
+  }, []);
 
-  // Dummy data for demonstration
-  const product = {
-    id: productId,
-    name: "Product Name",
-    price: "$100",
-    inStock: true,
-    rating: 4.5,
-    imageUrl: img1, // Replace with actual image URL
-    description: "Product description goes here. This is a sample description.",
-    features: ["Feature 1", "Feature 2", "Feature 3", "Feature 4", "Feature 5"],
+  const getProducts = async () => {
+    const products = await axios.get(recieveProductRoute);
+    console.log("Products ", products);
+    console.log("Product Id ", productId);
+    const filteredProduct = products.data.find((p) => p._id === productId);
+    console.log("product is ", filteredProduct);
+    setProduct(filteredProduct);
   };
 
   return (
     <>
-      <Navbar />
-      <Container>
-        <ProductImage src={product.imageUrl} alt={product.name} />
-        <ProductInfo>
-          <ProductName>{product.name}</ProductName>
-          <ProductPrice>{product.price}</ProductPrice>
-          {product.inStock ? (
-            <InStock>In stock</InStock>
-          ) : (
-            <OutOfStock>Out of stock</OutOfStock>
-          )}
-          <RatingSection>
-            <StarRating rating={product.rating} />
-            <RatingNumber>{product.rating}</RatingNumber>
-          </RatingSection>
-          <QuantityDropdown>
-            {[...Array(10)].map((_, index) => (
-              <option key={index + 1} value={index + 1}>
-                {index + 1}
-              </option>
-            ))}
-          </QuantityDropdown>
-          <ActionButtons>
-            <ActionButton>Add to Cart</ActionButton>
-            <ActionButton>Add to Wishlist</ActionButton>
-          </ActionButtons>
-        </ProductInfo>
-      </Container>
-      <DescriptionContainer>
-        <h3>Description:</h3>
-        <p>{product.description}</p>
-        <h3>Features:</h3>
-        <ul>
-          {product.features.map((feature, index) => (
-            <li key={index}>{feature}</li>
-          ))}
-        </ul>
-      </DescriptionContainer>
-      <HorizontalLine />
-      <ReviewContainer>
-        <h3>Add Review:</h3>
-        <RatingSection>
-          Your Rating: <StarRating rating={0} />
-        </RatingSection>
-        <EmailInput type="email" placeholder="Your Email" />
-        <FeedbackInput placeholder="Your Feedback..." />
-        <SubmitButton>Add Review</SubmitButton>
-      </ReviewContainer>
+      {product.product ? (
+        <>
+          <Navbar />
+          <Container>
+            <ProductImage
+              src={`http://localhost:8081/${product.product.image}`}
+              width={"300px"}
+              height={"300px"}
+              alt={product.product.productName}
+            />
+            <ProductInfo>
+              <ProductName>{product.product.productName}</ProductName>
+              <ProductPrice>{product.product.price}</ProductPrice>
+              {product.product.status === "Availability" ? (
+                <InStock>In stock</InStock>
+              ) : (
+                <OutOfStock>Out of stock</OutOfStock>
+              )}
+              <RatingSection>
+                <StarRating rating={product.product.rating} />
+                <RatingNumber>{product.product.rating}</RatingNumber>
+              </RatingSection>
+              <QuantityDropdown>
+                {[...Array(10)].map((_, index) => (
+                  <option key={index + 1} value={index + 1}>
+                    {index + 1}
+                  </option>
+                ))}
+              </QuantityDropdown>
+              <ActionButtons>
+                <ActionButton>Add to Cart</ActionButton>
+                <ActionButton>Add to Wishlist</ActionButton>
+              </ActionButtons>
+            </ProductInfo>
+          </Container>
+          <DescriptionContainer>
+            <h3>Description:</h3>
+            <p>{product.product.description}</p>
+            <h3>Features:</h3>
+            <ul>
+              {product.product.features.map((feature, index) => (
+                <li key={index}>{feature}</li>
+              ))}
+            </ul>
+          </DescriptionContainer>
+          <HorizontalLine />
+          <ReviewContainer>
+            <h3>Add Review:</h3>
+            <RatingSection>
+              Your Rating: <StarRating rating={0} />
+            </RatingSection>
+            <EmailInput type="email" placeholder="Your Email" />
+            <FeedbackInput placeholder="Your Feedback..." />
+            <SubmitButton>Add Review</SubmitButton>
+          </ReviewContainer>
+        </>
+      ) : (
+        <>
+          <h2>Loading...</h2>
+        </>
+      )}
     </>
   );
 };
@@ -101,10 +114,10 @@ const Container = styled.div`
 `;
 
 const ProductImage = styled.img`
-flex: 1;
+  flex: 1;
   max-height: 900px;
-object-fit: cover;
-border-radius: 7px;
+  object-fit: cover;
+  border-radius: 7px;
 `;
 
 const ProductInfo = styled.div`

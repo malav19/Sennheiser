@@ -3,7 +3,7 @@ import React from "react";
 
 import styled from "styled-components";
 import { Route, Routes, Outlet, useNavigate } from "react-router-dom";
-import Sidebar from "../components/Admin/Sidebar";
+import Navbar from "../components/User/Navbar";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -12,20 +12,24 @@ export default function AdminDashboard() {
   };
 
   return (
-    <Container>
-      <Sidebar handleLogout={handleLogout} />
+    <>
+      <Navbar />
+    </>
 
-      {/* Main Content */}
-      <MainContent>
-        <Routes>
-          <Route path="/" element={<h2>Main Content</h2>} />
-          <Route path="orders/*" element={<Outlet />} />
-          <Route path="customers/*" element={<Outlet />} />
-          <Route path="products/*" element={<Outlet />} />
-        </Routes>
-        <Outlet />
-      </MainContent>
-    </Container>
+    // <Container>
+    //   <Sidebar handleLogout={handleLogout} />
+
+    //   {/* Main Content */}
+    //   <MainContent>
+    //     <Routes>
+    //       <Route path="/" element={<h2>Main Content</h2>} />
+    //       <Route path="orders/*" element={<Outlet />} />
+    //       <Route path="customers/*" element={<Outlet />} />
+    //       <Route path="products/*" element={<Outlet />} />
+    //     </Routes>
+    //     <Outlet />
+    //   </MainContent>
+    // </Container>
   );
 }
 

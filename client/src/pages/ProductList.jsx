@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Navbar from "../components/User/Navbar";
 import img1 from "../assets/wire_earphone.jpeg";
@@ -7,7 +7,8 @@ import img3 from "../assets/podcast_kit.jpeg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar, faStarHalf } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
-
+import { recieveProductRoute } from "../utils/APIRoutes";
+import axios from "axios";
 const StarRating = ({ rating }) => {
   const filledStars = Math.floor(rating);
   const hasHalfStar = rating % 1 !== 0;
@@ -27,49 +28,71 @@ const StarRating = ({ rating }) => {
 };
 
 const ProductListPage = () => {
-  const products = [
-    {
-      id: 1,
-      name: "Product 1",
-      price: "$10",
-      rating: 4,
-      image: img1,
-    },
-    {
-      id: 2,
-      name: "Product 2",
-      price: "$20",
-      rating: 3,
-      image: img2,
-    },
-    {
-      id: 3,
-      name: "Product 3",
-      price: "$30",
-      rating: 2.5,
-      image: img3,
-    },
-    // Add more products as needed
-  ];
+  const [products, setProducts] = useState([]);
+  const [product, setProduct] = useState({});
+  useEffect(() => {
+    getProducts();
+  }, []);
+
+  const getProducts = async () => {
+    console.log("getting products ");
+    const products = await axios.get(recieveProductRoute);
+    console.log("getProducts ", products);
+    setProducts(products.data);
+    // .then((res)=>res.json())
+    // .then((data)=>setProducts(data))
+    // .catch((error)=>console.error('Error fetching products: ',error));
+  };
+  // const products =
+
+  // [
+  //   {
+  //     id: 1,
+  //     name: "Product 1",
+  //     price: "$10",
+  //     rating: 4,
+  //     image: img1,
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Product 2",
+  //     price: "$20",
+  //     rating: 3,
+  //     image: img2,
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "Product 3",
+  //     price: "$30",
+  //     rating: 2.5,
+  //     image: img3,
+  //   },
+  //   // Add more products as needed
+  // ];
 
   return (
     <>
       <Navbar />
       <Container>
         <ProductGrid>
-          {products.map((product) => (
-            <ProductCard key={product.id}>
-              <ProductImage src={product.image} alt={product.name} />
+          {products.map(({ product }, index) => (
+            <ProductCard key={products[index]._id}>
+              <ProductImage
+                src={`http://localhost:8081/${product.image}`}
+                alt={product.productName}
+              />
               <ProductDetails>
-                <ProductName>{product.name}</ProductName>
-                <ProductPrice>{product.price}</ProductPrice>
+                <ProductName>{product.productName}</ProductName>
+                <ProductPrice>${product.price}</ProductPrice>
                 <StarContainer>
                   <StarRating rating={product.rating} />
                   <RatingNumber>{product.rating}</RatingNumber>
                 </StarContainer>
               </ProductDetails>
 
-              <ViewButton to={`/product/${product.id}`}>View</ViewButton>
+              <ViewButton to={`/product/${products[index]._id}`}>
+                View
+              </ViewButton>
             </ProductCard>
           ))}
         </ProductGrid>
@@ -106,10 +129,10 @@ const ProductCard = styled.div`
 `;
 
 const ProductImage = styled.img`
-width: 100%;
-height: 270px;
-object-fit: cover;
-border-radius: 5px 5px 0 0;
+  width: 100%;
+  height: 270px;
+  object-fit: cover;
+  border-radius: 5px 5px 0 0;
 `;
 
 const ProductDetails = styled.div`
