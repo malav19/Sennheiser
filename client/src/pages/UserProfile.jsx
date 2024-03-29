@@ -3,11 +3,24 @@ import styled from "styled-components";
 import Navbar from "../components/User/Navbar";
 import EditProfile from "../components/Models/EditProfile";
 import AddressModal from "../components/Models/AddressModal";
-
+import { useNavigate } from "react-router-dom";
+import { logoutRoute } from "../utils/APIRoutes";
+import axios from "axios";
 const UserProfile = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [modalHeaderAddress, setModalHeaderAddress] = useState("");
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+  const navigate = useNavigate();
+  const handleLogout = async () => {
+    const id = await JSON.parse(
+      localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
+    )._id;
+    const data = await axios.get(`${logoutRoute}/${id}`);
+    if (data.status === 200) {
+      localStorage.clear();
+      navigate("/login");
+    }
+  };
 
   const handleEditProfileClick = () => {
     setIsEditModalOpen(true);
@@ -64,7 +77,7 @@ const UserProfile = () => {
         />
       </Container>
       {!isEditModalOpen && !isAddressModalOpen && (
-        <LogoutButton>Logout</LogoutButton>
+        <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
       )}
     </>
   );

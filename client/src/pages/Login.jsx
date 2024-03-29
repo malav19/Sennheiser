@@ -20,42 +20,40 @@ export default function Login() {
     theme: "dark",
   };
 
-// if user already exists it will redirect to the login page
-useEffect(() => {
-  if (localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)) {
-    navigate("/");
-  }
-}, []);
+  useEffect(() => {
+    if (localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)) {
+      navigate("/");
+    }
+  }, []);
 
-const handleChange = (event) => {
-  setValues({ ...values, [event.target.name]: event.target.value });
-};
+  const handleChange = (event) => {
+    setValues({ ...values, [event.target.name]: event.target.value });
+  };
 
-const validateForm = () => {
-  const { username, password } = values;
-  if (username === "") {
-    toast.error("Email and Password is required.", toastOptions);
-    return false;
-  } else if (password === "") {
-    toast.error("Email and Password is required.", toastOptions);
-    return false;
-  }
-  return true;
-};
-
-const handleSubmit = async (event) => {
-  event.preventDefault();
-  if (validateForm()) {
+  const validateForm = () => {
     const { username, password } = values;
-    if (username === "admin" && password === "admin@1234") {
-      // Navigate to the admin dashboard
-      navigate("/admin");
-    } else {
+    if (username === "") {
+      toast.error("Email and Password is required.", toastOptions);
+      return false;
+    } else if (password === "") {
+      toast.error("Email and Password is required.", toastOptions);
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    console.log("values ", values);
+    if (validateForm()) {
+      const { username, password } = values;
       // If not an admin, perform the regular login logic
       const { data } = await axios.post(loginRoute, {
         username,
         password,
       });
+      console.log("User Type", data);
+      const page = data.user.userType === "user" ? "/" : "/admin/products";
       if (data.status === false) {
         toast.error(data.msg, toastOptions);
       }
@@ -65,43 +63,43 @@ const handleSubmit = async (event) => {
           JSON.stringify(data.user)
         );
 
-        navigate("/");
+        navigate(page);
       }
     }
-  }
-};
-return (
-  <>
-    <FormContainer>
-      <form action="" onSubmit={(event) => handleSubmit(event)}>
-        <Header />
-        <Input
-          type="text"
-          placeholder="Username"
-          name="username"
-          onChange={(e) => handleChange(e)}
-          min="3"
-        />
-        <Input
-          type="password"
-          placeholder="Password"
-          name="password"
-          onChange={(e) => handleChange(e)}
-        />
+  };
 
-        <span>
-          <Link to="/forgot-password">Forgot Password?</Link>
-        </span>
-        <Button type="submit" text="Log In" />
+  return (
+    <>
+      <FormContainer>
+        <form action="" onSubmit={(event) => handleSubmit(event)}>
+          <Header />
+          <Input
+            type="text"
+            placeholder="Username"
+            name="username"
+            onChange={(e) => handleChange(e)}
+            min="3"
+          />
+          <Input
+            type="password"
+            placeholder="Password"
+            name="password"
+            onChange={(e) => handleChange(e)}
+          />
 
-        <span>
-          Don't have an account ? <Link to="/register">Create One.</Link>
-        </span>
-      </form>
-    </FormContainer>
-    <ToastContainer />
-  </>
-);
+          <span>
+            <Link to="/forgot-password">Forgot Password?</Link>
+          </span>
+          <Button type="submit" text="Log In" />
+
+          <span>
+            Don't have an account ? <Link to="/register">Create One.</Link>
+          </span>
+        </form>
+      </FormContainer>
+      <ToastContainer />
+    </>
+  );
 }
 
 const FormContainer = styled.div`

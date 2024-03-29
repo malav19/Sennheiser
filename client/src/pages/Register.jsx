@@ -24,6 +24,7 @@ export default function Register() {
     email: "",
     password: "",
     confirmPassword: "",
+    userType: "user",
   });
 
   useEffect(() => {
@@ -67,11 +68,12 @@ export default function Register() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (handleValidation()) {
-      const { email, username, password } = values;
+      const { email, username, password,userType } = values;
       const { data } = await axios.post(registerRoute, {
         username,
         email,
         password,
+        userType
       });
 
       if (data.status === false) {

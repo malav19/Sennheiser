@@ -19,6 +19,9 @@ const userSchema = new mongoose.Schema({
     required: true,
     min: 8,
   },
+  userType: {
+    type: String,
+  }
 });
 
 module.exports = mongoose.model("Users", userSchema);
@@ -31,6 +34,6 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-const  User = mongoose.model("User", userSchema);
+const User = mongoose.model("User", userSchema);
 
 module.exports = User;

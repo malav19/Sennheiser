@@ -18,6 +18,7 @@ mongoose
 
 app.use(morgan("dev"));
 app.use(cors({ origin: true, credentials: true }));
+app.use(express.static('uploads'));
 app.use("/api/auth", authRoutes);
 app.use("/api/product", productRoutes);
 const port = process.env.PORT || 8081;
