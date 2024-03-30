@@ -16,7 +16,6 @@ module.exports.login = async (req, res, next) => {
       return res.json({ msg: "Incorrect Username or Password", status: false });
     }
 
-    // delete user.password;
     return res.json({ status: true, user });
   } catch (ex) {
     next(ex);
@@ -24,7 +23,6 @@ module.exports.login = async (req, res, next) => {
 };
 
 module.exports.register = async (req, res, next) => {
-
   try {
     const { username, email, password, userType } = req.body;
     const usernameCheck = await User.findOne({ username });
@@ -39,7 +37,7 @@ module.exports.register = async (req, res, next) => {
       email,
       username,
       password,
-      userType
+      userType,
     });
 
     console.log("user in registration ", user);
@@ -88,5 +86,16 @@ module.exports.forgotPassword = async (req, res, next) => {
     return res
       .status(500)
       .json({ status: false, message: "Internal Server Error" });
+  }
+};
+
+module.exports.getUsers = async (req, res) => {
+  try {
+    const users = await User.find();
+
+    return res.json(users);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server Error" });
   }
 };

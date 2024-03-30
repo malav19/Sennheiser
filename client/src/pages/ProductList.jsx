@@ -1,81 +1,46 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Navbar from "../components/User/Navbar";
-import img1 from "../assets/wire_earphone.jpeg";
-import img2 from "../assets/headset.jpeg";
-import img3 from "../assets/podcast_kit.jpeg";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faStar, faStarHalf } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import { recieveProductRoute } from "../utils/APIRoutes";
 import axios from "axios";
-const StarRating = ({ rating }) => {
-  const filledStars = Math.floor(rating);
-  const hasHalfStar = rating % 1 !== 0;
-
-  const stars = [];
-  for (let i = 1; i <= 5; i++) {
-    if (i <= filledStars) {
-      stars.push(<FontAwesomeIcon key={i} icon={faStar} color="#FFD700" />);
-    } else if (hasHalfStar && i === filledStars + 1) {
-      stars.push(<FontAwesomeIcon key={i} icon={faStarHalf} color="#FFD700" />);
-    } else {
-      stars.push(<FontAwesomeIcon key={i} icon={faStar} color="#ccc" />);
-    }
-  }
-
-  return <div>{stars}</div>;
-};
+import Footar from "../components/User/Footar";
 
 const ProductListPage = () => {
   const [products, setProducts] = useState([]);
-  const [product, setProduct] = useState({});
+  const [searchQuery, setSearchQuery] = useState("");
+
   useEffect(() => {
     getProducts();
   }, []);
 
   const getProducts = async () => {
-    console.log("getting products ");
-    const products = await axios.get(recieveProductRoute);
-    console.log("getProducts ", products);
-    setProducts(products.data);
-    // .then((res)=>res.json())
-    // .then((data)=>setProducts(data))
-    // .catch((error)=>console.error('Error fetching products: ',error));
-  };
-  // const products =
+    try {
+      const response = await axios.get(recieveProductRoute);
 
-  // [
-  //   {
-  //     id: 1,
-  //     name: "Product 1",
-  //     price: "$10",
-  //     rating: 4,
-  //     image: img1,
-  //   },
-  //   {
-  //     id: 2,
-  //     name: "Product 2",
-  //     price: "$20",
-  //     rating: 3,
-  //     image: img2,
-  //   },
-  //   {
-  //     id: 3,
-  //     name: "Product 3",
-  //     price: "$30",
-  //     rating: 2.5,
-  //     image: img3,
-  //   },
-  //   // Add more products as needed
-  // ];
+      const productsWithWishlist = response.data.map((product) => ({
+        ...product,
+        isInWishlist: false,
+      }));
+      setProducts(productsWithWishlist);
+    } catch (error) {
+      console.error("Error fetching products: ", error);
+    }
+  };
+
+  const filteredProducts = products.filter(
+    ({ product }) =>
+      product &&
+      product.productName &&
+      product.productName.toLowerCase().startsWith(searchQuery.toLowerCase())
+  );
 
   return (
-    <>
-      <Navbar />
+    <PageContainer>
+      <Navbar setSearchQuery={setSearchQuery} />
       <Container>
         <ProductGrid>
-          {products.map(({ product }, index) => (
+          {filteredProducts.map(({ product }, index) => (
             <ProductCard key={products[index]._id}>
               <ProductImage
                 src={`http://localhost:8081/${product.image}`}
@@ -83,46 +48,51 @@ const ProductListPage = () => {
               />
               <ProductDetails>
                 <ProductName>{product.productName}</ProductName>
-                <ProductPrice>${product.price}</ProductPrice>
-                <StarContainer>
-                  <StarRating rating={product.rating} />
-                  <RatingNumber>{product.rating}</RatingNumber>
-                </StarContainer>
+                <ProductPriceAndWishlist>
+                  <ProductPrice>$ {product.price}</ProductPrice>
+                </ProductPriceAndWishlist>
               </ProductDetails>
-
               <ViewButton to={`/product/${products[index]._id}`}>
                 View
               </ViewButton>
             </ProductCard>
           ))}
         </ProductGrid>
-        <Pagination>
-          <Button>Previous</Button>
-          <PageNumber>Page 1</PageNumber>
-          <Button>Next</Button>
-        </Pagination>
       </Container>
-    </>
+      <Footar />
+    </PageContainer>
   );
 };
 
+const PageContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: rgb(247, 247, 251);
+`;
+
 const Container = styled.div`
+  flex-grow: 1; /* Fill remaining vertical space */
   padding: 2rem;
 `;
 
 const ProductGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(
+    3,
+    1fr
+  ); /* Each column takes one-third of available width */
   gap: 1rem;
   justify-items: center;
 `;
 
 const ProductCard = styled.div`
   background-color: #ffffff;
+  border: 0.5px solid white;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   width: 250px;
-  height: 450px;
+  height: 400px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -136,30 +106,34 @@ const ProductImage = styled.img`
 `;
 
 const ProductDetails = styled.div`
-  flex-grow: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   padding: 1rem;
-
   border-radius: 0 0 5px 5px;
 `;
 
 const ProductName = styled.h3`
-  margin: 0.5rem 0;
+  margin: 0;
+  font-weight: bold;
+  font-size: 1.2rem;
+`;
+
+const ProductPriceAndWishlist = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto; /* Move to the bottom */
 `;
 
 const ProductPrice = styled.p`
   margin: 0;
+  font-weight: bold;
+  font-size: 1.2rem;
 `;
 
-const StarContainer = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const RatingNumber = styled.span`
-  margin-left: 0.5rem;
+const WishlistIcon = styled.div`
+  color: ${({ isInWishlist }) => (isInWishlist ? "red" : "black")};
+  cursor: pointer;
 `;
 
 const ViewButton = styled(Link)`
@@ -169,35 +143,11 @@ const ViewButton = styled(Link)`
   border-radius: 3px;
   background: linear-gradient(to right, #f472b6, #60a5fa);
   color: white;
-  text-decoration: none; /* Remove default link underline */
+  text-decoration: none;
   cursor: pointer;
-
-  /* Center-align text */
   display: flex;
   justify-content: center;
   align-items: center;
-`;
-
-const Pagination = styled.div`
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  display: flex;
-  align-items: center;
-`;
-
-const Button = styled.button`
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 5px;
-  background: linear-gradient(to right, #f472b6, #60a5fa);
-  cursor: pointer;
-  margin: 0 0.5rem;
-  color: white;
-`;
-
-const PageNumber = styled.span`
-  margin: 0 0.5rem;
 `;
 
 export default ProductListPage;

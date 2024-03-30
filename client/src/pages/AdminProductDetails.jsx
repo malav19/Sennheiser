@@ -6,13 +6,14 @@ import DropdownButton from "react-bootstrap/DropdownButton";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Navbar from "../components/User/Navbar";
-
+import Footar from "../components/User/Footar";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.css";
 import { ToastContainer, toast } from "react-toastify";
 import { productRoute } from "../utils/APIRoutes";
 import { updateProductRoute } from "../utils/APIRoutes";
 import { deleteProductRoute } from "../utils/APIRoutes";
+
 export default function AdminProductDetails() {
   const navigate = useNavigate();
   const handleLogout = () => {
@@ -25,6 +26,7 @@ export default function AdminProductDetails() {
   const [product, setProduct] = useState({ status: "Availability" });
   const handleClose = () => setShowModal(false);
   const handleShow = () => setShowModal(true);
+
   const toastOptions = {
     position: "bottom-right",
     autoClose: 8000,
@@ -85,19 +87,12 @@ export default function AdminProductDetails() {
         toast.error(data.msg, toastOptions);
       }
       if (data.status === true) {
-        // console.log("Data Status is true---", data.user);
-        // localStorage.setItem(
-        //   process.env.REACT_APP_LOCALHOST_KEY,
-        //   JSON.stringify(data.user)
-        // );
         handleClose();
         navigate("/admin/products");
       }
     }
   };
-  // Ended adding product functionality
 
-  // Functionality for deleting product
   const handleDeleteProduct = async (productId) => {
     console.log("Product id", productId);
     await axios.delete(deleteProductRoute, {
@@ -109,9 +104,7 @@ export default function AdminProductDetails() {
     console.log("updated products after filter", pd);
     setProducts(updatePd);
   };
-  //ending functionality for deleting product
 
-  //update status
   const updateStatus = (status) => {
     console.log("status updated to ", status);
     const productinside = { ...product, status: status };
@@ -119,14 +112,12 @@ export default function AdminProductDetails() {
     setProduct(productinside);
     console.log("product after status update ", product);
   };
-  // Functionality for updating product
-  const showUpdateProduct = async (product) => {
-    setProduct(product.product); // Set the product data to update
-    setCurrentProductId(product._id);
-    setShowModal(true); // Open the modal
-  };
 
-  // Functionality to get the products from backend started---
+  const showUpdateProduct = async (product) => {
+    setProduct(product.product);
+    setCurrentProductId(product._id);
+    setShowModal(true);
+  };
 
   useEffect(() => {
     getProducts();
@@ -144,15 +135,12 @@ export default function AdminProductDetails() {
       features,
     } = product;
     const formData = new FormData();
-    // Convert features array to a comma-separated string
     const featuresString = Array.isArray(features) ? features.join(",") : "";
 
-    // Split the comma-separated string into an array
     const featuresArray = featuresString
       .split(",")
       .map((feature) => feature.trim());
 
-    // Now you can directly use featuresArray in your FormData or wherever needed
     featuresArray.forEach((feature, index) => {
       formData.append(`features[${index}]`, feature);
     });
@@ -164,7 +152,6 @@ export default function AdminProductDetails() {
     formData.append("image", image);
     formData.append("description", description || "");
     formData.append("_id", currentProductId);
-    // const updatedProduct = { product, _id: currentProductId };
     console.log("updated product ", formData);
     try {
       const result = await axios.put(updateProductRoute, formData, {
@@ -183,12 +170,7 @@ export default function AdminProductDetails() {
     );
     console.log("getProducts ", products);
     setProducts(products.data);
-    // .then((res)=>res.json())
-    // .then((data)=>setProducts(data))
-    // .catch((error)=>console.error('Error fetching products: ',error));
   };
-
-  // Functionality ended for getting the products
 
   return (
     <>
@@ -197,11 +179,10 @@ export default function AdminProductDetails() {
         <MainContent>
           <Heading>
             <h2>Product Details</h2>
-            {/*  Functionality for adding the data in the products page */}
             <>
-              <Button variant="dark" onClick={handleShow}>
-                Add{" "}
-              </Button>
+              <StyledButton variant="dark" onClick={handleShow}>
+                Add
+              </StyledButton>
 
               <Modal show={showModal} onHide={handleClose}>
                 <Modal.Header closeButton>
@@ -242,7 +223,6 @@ export default function AdminProductDetails() {
                       <Form.Control
                         type="file"
                         accept="image/*"
-                        // defaultValue={product.image}
                         onChange={(e) =>
                           setProduct({
                             ...product,
@@ -290,8 +270,11 @@ export default function AdminProductDetails() {
                         }
                       />
                     </Form.Group>
-                    <Form.Group controlId="status">
-                      <Form.Label>Status</Form.Label>
+                    <Form.Group
+                      style={{ marginTop: "10px" }}
+                      controlId="status"
+                    >
+                      <Form.Label style={{ margin: "4px" }}>Status</Form.Label>
                       <DropdownButton
                         as={ButtonGroup}
                         id={"dropdown-basic-button"}
@@ -304,7 +287,6 @@ export default function AdminProductDetails() {
                         <Dropdown.Item eventKey="Out of Stock">
                           Out of Stock
                         </Dropdown.Item>
-                        {/* </Dropdown.Menu> */}
                       </DropdownButton>
                     </Form.Group>
                     <Button
@@ -319,8 +301,6 @@ export default function AdminProductDetails() {
               </Modal>
               <ToastContainer />
             </>
-
-            {/* Ending here with the functionality for adding products data */}
           </Heading>
           <ColumnNames>
             <div>Product Number</div>
@@ -362,6 +342,7 @@ export default function AdminProductDetails() {
           ))}
         </MainContent>
       </Container>
+      <Footar />
     </>
   );
 }
@@ -407,4 +388,14 @@ const MainContent = styled.div`
   padding: 1rem;
   background-color: white;
   overflow: auto;
+`;
+
+const StyledButton = styled(Button)`
+  background: linear-gradient(to right, #f472b6, #60a5fa);
+  border: none;
+  font-weight: bold; /* Making text bold */
+  font-size: 1.2em; /* Increasing font size */
+  &:hover {
+    background: linear-gradient(to right, #f472b6, #60a5fa);
+  }
 `;

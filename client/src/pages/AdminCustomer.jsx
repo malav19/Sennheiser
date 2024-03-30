@@ -1,78 +1,51 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
-import Sidebar from "../components/Admin/Sidebar";
+import Navbar from "../components/User/Navbar";
+import axios from "axios";
+import Footar from "../components/User/Footar";
 
-import { useParams } from "react-router-dom";
 export default function AdminCustomer() {
-  const navigate = useNavigate();
-  const handleLogout = () => {
-    navigate("/login");
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    getUsers();
+  }, []);
+
+  const getUsers = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:8081/api/auth/getUsers"
+      );
+
+      setUsers(response.data);
+    } catch (error) {
+      console.error("Error fetching users: ", error);
+    }
   };
-  const { orderId } = useParams();
-  const customers = [
-    {
-      id: 1,
-      customerName: "Saurav Verma",
-      date: "2024-03-03",
-      email: "saurav29verma@gmail.com",
-      amountSpents: "$500",
-      totalOrders: 20,
-    },
-
-    {
-      id: 2,
-      customerName: "Jagraj Kaur",
-      date: "2024-03-03",
-      email: "kaurjagraj@gmail.com",
-      amountSpents: "$1000",
-      totalOrders: 20,
-    },
-    {
-      id: 1,
-      customerName: "Malav Patel",
-      date: "2024-03-03",
-      email: "malavpatel@gmail.com",
-      amountSpents: "$500",
-      totalOrders: 20,
-    },
-    {
-      id: 2,
-      customerName: "Karanveer Kaur",
-      date: "2024-03-03",
-      email: "karanveer@gmail.com",
-      amountSpents: "$1000",
-      totalOrders: 20,
-    },
-    // Add more customers as needed
-  ];
-
   return (
-    <Container>
-      <Sidebar handleLogout={handleLogout} />
-
-      <MainContent>
-        <h2>Customer Details</h2>
-        <ColumnNames>
-          <div>Customer Name</div>
-          <div>Email Address</div>
-          <div>Date</div>
-          <div>Total Money Spent</div>
-          <div>Total Orders</div>
-        </ColumnNames>
-        {customers.map((customer) => (
-          <OrderSquare key={customer.id}>
-            <ColumnValues>
-              <div>{customer.customerName}</div>
-              <div>{customer.email}</div>
-              <div>{customer.date}</div>
-              <div>{customer.amountSpents}</div>
-              <div>{customer.totalOrders}</div>
-            </ColumnValues>
-          </OrderSquare>
-        ))}
-      </MainContent>
-    </Container>
+    <>
+      <Navbar />
+      <Container>
+        <MainContent>
+          <h2>Customer Details</h2>
+          <ColumnNames>
+            <div>Number</div>
+            <div>Customer Name</div>
+            <div>Email Address</div>
+          </ColumnNames>
+          {users.map((customer, index) => (
+            <OrderSquare key={customer._id}>
+              <ColumnValues>
+                <div>{index + 1}</div>
+                <div>{customer.username}</div>
+                <div>{customer.email}</div>
+              </ColumnValues>
+            </OrderSquare>
+          ))}
+        </MainContent>
+      </Container>
+      <Footar />
+    </>
   );
 }
 

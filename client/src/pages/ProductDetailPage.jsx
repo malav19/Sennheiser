@@ -1,31 +1,16 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../components/User/Navbar";
 import { recieveProductRoute } from "../utils/APIRoutes";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faStar, faStarHalf } from "@fortawesome/free-solid-svg-icons";
-import img1 from "../assets/wire_earphone.jpeg";
+import Footar from "../components/User/Footar";
 import axios from "axios";
-const StarRating = ({ rating }) => {
-  const filledStars = Math.floor(rating);
-  const hasHalfStar = rating % 1 !== 0;
-  const stars = [];
-  for (let i = 1; i <= 5; i++) {
-    if (i <= filledStars) {
-      stars.push(<FontAwesomeIcon key={i} icon={faStar} color="#FFD700" />);
-    } else if (hasHalfStar && i === filledStars + 1) {
-      stars.push(<FontAwesomeIcon key={i} icon={faStarHalf} color="#FFD700" />);
-    } else {
-      stars.push(<FontAwesomeIcon key={i} icon={faStar} color="#ccc" />);
-    }
-  }
-
-  return <div>{stars}</div>;
-};
 
 const ProductDetailPage = () => {
   const [product, setProduct] = useState({});
+  const [quantity, setQuantity] = useState(1);
+  const navigate = useNavigate();
+
   const { productId } = useParams();
   useEffect(() => {
     getProducts();
@@ -40,83 +25,110 @@ const ProductDetailPage = () => {
     setProduct(filteredProduct);
   };
 
+  const handleAddToCart = () => {
+    const existingCartItems =
+      JSON.parse(localStorage.getItem("cartItems")) || [];
+    const existingItemIndex = existingCartItems.findIndex(
+      (item) => item.product._id === product._id
+    );
+
+    if (existingItemIndex !== -1) {
+      existingCartItems[existingItemIndex].quantity += quantity;
+    } else {
+      existingCartItems.push({
+        product: product,
+        quantity: quantity,
+      });
+    }
+
+    localStorage.setItem("cartItems", JSON.stringify(existingCartItems));
+    navigate("/cart");
+  };
+
   return (
-    <>
+    <PageContainer>
       {product.product ? (
         <>
           <Navbar />
-          <Container>
-            <ProductImage
-              src={`http://localhost:8081/${product.product.image}`}
-              width={"300px"}
-              height={"300px"}
-              alt={product.product.productName}
-            />
-            <ProductInfo>
-              <ProductName>{product.product.productName}</ProductName>
-              <ProductPrice>{product.product.price}</ProductPrice>
-              {product.product.status === "Availability" ? (
-                <InStock>In stock</InStock>
-              ) : (
-                <OutOfStock>Out of stock</OutOfStock>
-              )}
-              <RatingSection>
-                <StarRating rating={product.product.rating} />
-                <RatingNumber>{product.product.rating}</RatingNumber>
-              </RatingSection>
-              <QuantityDropdown>
-                {[...Array(10)].map((_, index) => (
-                  <option key={index + 1} value={index + 1}>
-                    {index + 1}
-                  </option>
+          <ContentContainer>
+            <Container>
+              <ProductImage
+                src={`http://localhost:8081/${product.product.image}`}
+                width={"300px"}
+                height={"300px"}
+                alt={product.product.productName}
+              />
+              <ProductInfo>
+                <ProductName>{product.product.productName}</ProductName>
+                <ProductPrice>$ {product.product.price}</ProductPrice>
+                {product.product.status === "Availability" ? (
+                  <InStock>In stock</InStock>
+                ) : (
+                  <OutOfStock>Out of stock</OutOfStock>
+                )}
+
+                <QuantityDropdown
+                  value={quantity}
+                  onChange={(e) => setQuantity(parseInt(e.target.value))}
+                >
+                  {[...Array(10)].map((_, index) => (
+                    <option key={index + 1} value={index + 1}>
+                      {index + 1}
+                    </option>
+                  ))}
+                </QuantityDropdown>
+                <ActionButtons>
+                  <ActionButton onClick={handleAddToCart}>
+                    Add to Cart
+                  </ActionButton>
+                </ActionButtons>
+              </ProductInfo>
+            </Container>
+            <DescriptionContainer>
+              <h3>Description:</h3>
+              <p>{product.product.description}</p>
+              <h3>Features:</h3>
+              <ul>
+                {product.product.features.map((feature, index) => (
+                  <li key={index}>{feature}</li>
                 ))}
-              </QuantityDropdown>
-              <ActionButtons>
-                <ActionButton>Add to Cart</ActionButton>
-                <ActionButton>Add to Wishlist</ActionButton>
-              </ActionButtons>
-            </ProductInfo>
-          </Container>
-          <DescriptionContainer>
-            <h3>Description:</h3>
-            <p>{product.product.description}</p>
-            <h3>Features:</h3>
-            <ul>
-              {product.product.features.map((feature, index) => (
-                <li key={index}>{feature}</li>
-              ))}
-            </ul>
-          </DescriptionContainer>
-          <HorizontalLine />
-          <ReviewContainer>
-            <h3>Add Review:</h3>
-            <RatingSection>
-              Your Rating: <StarRating rating={0} />
-            </RatingSection>
-            <EmailInput type="email" placeholder="Your Email" />
-            <FeedbackInput placeholder="Your Feedback..." />
-            <SubmitButton>Add Review</SubmitButton>
-          </ReviewContainer>
+              </ul>
+            </DescriptionContainer>
+            <HorizontalLine />
+          </ContentContainer>
         </>
       ) : (
         <>
           <h2>Loading...</h2>
         </>
       )}
-    </>
+      <Footar />
+    </PageContainer>
   );
 };
+
+const PageContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+`;
+
+const ContentContainer = styled.div`
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+`;
 
 const Container = styled.div`
   padding: 2rem;
   display: flex;
   align-items: stretch;
 `;
-
 const ProductImage = styled.img`
   flex: 1;
-  max-height: 900px;
-  object-fit: cover;
+  max-width: 100%;
+  height: 400px;
+  object-fit: contain;
   border-radius: 7px;
 `;
 
@@ -151,14 +163,6 @@ const OutOfStock = styled.p`
   margin-top: 1rem;
 `;
 
-const RatingSection = styled.div`
-  margin-top: 2rem;
-`;
-
-const RatingNumber = styled.span`
-  margin-left: 0.5rem;
-`;
-
 const QuantityDropdown = styled.select`
   font-size: 1rem;
   padding: 0.5rem;
@@ -187,33 +191,6 @@ const HorizontalLine = styled.hr`
   border: 0;
   border-top: 1px solid #ccc;
   margin: 2rem 0;
-`;
-
-const ReviewContainer = styled.div`
-  padding: 2rem;
-`;
-
-const EmailInput = styled.input`
-  width: 100%;
-  padding: 0.5rem;
-  margin-top: 1rem;
-`;
-
-const FeedbackInput = styled.textarea`
-  width: 100%;
-  height: 150px;
-  padding: 0.5rem;
-  margin-top: 1rem;
-`;
-
-const SubmitButton = styled.button`
-  padding: 0.5rem 1rem;
-  margin-top: 1rem;
-  background-color: #60a5fa;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
 `;
 
 export default ProductDetailPage;

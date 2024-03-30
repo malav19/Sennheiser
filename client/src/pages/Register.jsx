@@ -68,12 +68,12 @@ export default function Register() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (handleValidation()) {
-      const { email, username, password,userType } = values;
+      const { email, username, password, userType } = values;
       const { data } = await axios.post(registerRoute, {
         username,
         email,
         password,
-        userType
+        userType,
       });
 
       if (data.status === false) {
@@ -175,6 +175,9 @@ const FormContainer = styled.div`
     }
   }
   button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     background: linear-gradient(to right, #f472b6, #60a5fa);
     color: white;
     padding: 1rem 2rem;
@@ -185,10 +188,10 @@ const FormContainer = styled.div`
     font-size: 1rem;
     text-transform: uppercase;
     &:hover {
-      background: linear-gradient(to right, rgb(244, 114, 182), rgb(96, 165, 250));
+      background-color: #006622;
     }
   }
-  
+
   span {
     color: black;
     text-transform: uppercase;

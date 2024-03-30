@@ -8,3 +8,4 @@ export const productRoute = `${host}/api/product/addproduct`;
 export const updateProductRoute = `${host}/api/product/updateproduct`;
 export const recieveProductRoute = `${host}/api/product/getproducts`;
 export const deleteProductRoute = `${host}/api/product/deleteproducts`;
+export const orderRoute = `${host}/api/order/addOrder`;

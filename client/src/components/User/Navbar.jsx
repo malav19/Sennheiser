@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -10,22 +10,14 @@ import {
 
 import Logo from "../../assets/Vibe.png";
 
-const Navbar = () => {
-  const navigate = useNavigate();
+const Navbar = ({ setSearchQuery }) => {
+  const storedUserData = JSON.parse(
+    localStorage.getItem("vibecheck-current-user")
+  );
 
-  const CartIcon = () => {
-    const handleClick = () => {
-      navigate("/cart");
-    };
-
-    return (
-      <IconLink onClick={handleClick}>
-        <IconCircle>
-          <FontAwesomeIcon icon={faShoppingCart} />
-        </IconCircle>
-      </IconLink>
-    );
-  };
+  const userType = storedUserData.userType;
+  const location = useLocation();
+  const showSearchBar = location.pathname.startsWith("/products");
 
   return (
     <NavContainer>
@@ -35,34 +27,50 @@ const Navbar = () => {
 
       <NavLinkContainer>
         <NavLink to="/">Home</NavLink>
-        <NavLink to="/products">Products</NavLink>
-        <NavLink to="/">Contact Us</NavLink>
-        <NavLink to="/about">About Us</NavLink>
+        {userType === "admin" ? (
+          <>
+            <NavLink to="/admin/products">Products</NavLink>
+            <NavLink to="/admin/orders">Orders</NavLink>
+            <NavLink to="/admin/customers">Customers</NavLink>
+            <NavLink to="/profile">Profile</NavLink>
+          </>
+        ) : (
+          <>
+            <NavLink to="/products/*">Products</NavLink>
+            <NavLink to="/about">About Us</NavLink>
+          </>
+        )}
       </NavLinkContainer>
+      {userType !== "admin" && (
+        <>
+          {showSearchBar && (
+            <>
+              <SearchContainer>
+                <SearchInput
+                  type="text"
+                  placeholder="Search products..."
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                <SearchButton type="button">Search</SearchButton>
+              </SearchContainer>
+            </>
+          )}
 
-      <SearchContainer>
-        <SearchInput type="text" placeholder="Search..." />
-        <SearchButton type="button">Search</SearchButton>
-      </SearchContainer>
+          <IconContainer>
+            <IconLink to="/profile">
+              <IconCircle>
+                <FontAwesomeIcon icon={faUser} />
+              </IconCircle>
+            </IconLink>
 
-      <IconContainer>
-        <IconLink to="/profile">
-          <IconCircle>
-            <FontAwesomeIcon icon={faUser} />
-          </IconCircle>
-        </IconLink>
-        <IconLink to="/wishlist">
-          <IconCircle>
-            <FontAwesomeIcon icon={faHeart} />
-          </IconCircle>
-        </IconLink>
-
-        <IconLink to="/cart">
-          <IconCircle>
-            <FontAwesomeIcon icon={faShoppingCart} />
-          </IconCircle>
-        </IconLink>
-      </IconContainer>
+            <IconLink to="/cart">
+              <IconCircle>
+                <FontAwesomeIcon icon={faShoppingCart} />
+              </IconCircle>
+            </IconLink>
+          </IconContainer>
+        </>
+      )}
     </NavContainer>
   );
 };
@@ -96,6 +104,7 @@ const LogoImage = styled.img`
 const NavLinkContainer = styled.div`
   display: flex;
   align-items: center;
+  margin-right: auto;
 `;
 
 const NavLink = styled(Link)`
