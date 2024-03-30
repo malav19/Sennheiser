@@ -1,19 +1,27 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Navbar from "../components/User/Navbar";
-import ProductCard from "../components/User/ProductCard";
-import img1 from "../assets/wire_earphone.jpeg";
-import img2 from "../assets/headset.jpeg";
-import img3 from "../assets/podcast_kit.jpeg";
 import audioImage from "../assets/audioImage.jpg";
+import Footar from "../components/User/Footar";
+import axios from "axios";
+import { recieveProductRoute } from "../utils/APIRoutes";
+import { Link } from "react-router-dom";
 
 export default function Dashboard() {
-  const topSellingProducts = [
-    { id: 1, name: "Wireless earplug", price: "$100", image: img1 },
-    { id: 2, name: "Headphone", price: "$150", image: img2 },
-    { id: 3, name: "Podcast Kit", price: "$320", image: img3 },
-  ];
+  const [products, setProducts] = useState([]);
+  useEffect(() => {
+    getProducts();
+  }, []);
 
+  const getProducts = async () => {
+    console.log("getting products ");
+    const products = await axios.get(recieveProductRoute);
+    console.log("getProducts ", JSON.stringify(products));
+    setProducts(products.data);
+    // .then((res)=>res.json())
+    // .then((data)=>setProducts(data))
+    // .catch((error)=>console.error('Error fetching products: ',error));
+  };
   const [currentUser, setCurrentUser] = useState(undefined);
 
   useEffect(() => {
@@ -54,17 +62,26 @@ export default function Dashboard() {
           <h2>Top Selling Products</h2>
 
           <ProductList>
-            {topSellingProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
+            {products.slice(0, 3).map((product) => (
+              <ProductCard key={product._id}>
+                <ProductImage
+                  src={`http://localhost:8081/${product.product.image}`}
+                  alt={product.product.productName}
+                />
+                <ProductDetails>
+                  <ProductName>{product.product.productName}</ProductName>
+                  <ProductPriceAndWishlist>
+                    <ProductPrice>$ {product.product.price}</ProductPrice>
+                  </ProductPriceAndWishlist>
+                </ProductDetails>
+                <ViewButton to={`/product/${product._id}`}>View</ViewButton>
+              </ProductCard>
             ))}
           </ProductList>
         </TopProducts>
       </Container>
 
-      {/* Footer Section */}
-      <Footer>
-        <p>&copy; 2024 Your Audio Products. All rights reserved.</p>
-      </Footer>
+      <Footar />
     </>
   );
 }
@@ -138,7 +155,7 @@ const ProductList = styled.div`
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 20px;
 
   @media screen and (max-width: 768px) {
     flex-direction: column;
@@ -146,9 +163,59 @@ const ProductList = styled.div`
   }
 `;
 
-const Footer = styled.footer`
+const ProductCard = styled.div`
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 250px;
+  height: 400px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+`;
+
+const ProductImage = styled.img`
+  width: 100%;
+  height: 270px;
+  object-fit: cover;
+  border-radius: 5px 5px 0 0;
+`;
+
+const ProductDetails = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  border-radius: 0 0 5px 5px;
+`;
+
+const ProductName = styled.h3`
+  margin: 0;
+  font-weight: bold;
+  font-size: 1.2rem;
+`;
+
+const ProductPriceAndWishlist = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto; /* Move to the bottom */
+`;
+
+const ProductPrice = styled.p`
+  margin: 0;
+  font-weight: bold;
+  font-size: 1.2rem;
+`;
+const ViewButton = styled(Link)`
+  display: inline-block;
+  padding: 0.3rem 0.8rem;
+  border: none;
+  border-radius: 3px;
   background: linear-gradient(to right, #f472b6, #60a5fa);
   color: white;
-  text-align: center;
-  padding: 1rem 0;
+  text-decoration: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;

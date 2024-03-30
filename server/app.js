@@ -4,6 +4,7 @@ const morgan = require("morgan");
 const cors = require("cors");
 const authRoutes = require("./routes/auth");
 const productRoutes = require("./routes/products");
+const orderRoutes = require("./routes/order");
 require("dotenv").config();
 
 const app = express();
@@ -18,9 +19,10 @@ mongoose
 
 app.use(morgan("dev"));
 app.use(cors({ origin: true, credentials: true }));
-app.use(express.static('uploads'));
+app.use(express.static("uploads"));
 app.use("/api/auth", authRoutes);
 app.use("/api/product", productRoutes);
+app.use("/api/order", orderRoutes);
 const port = process.env.PORT || 8081;
 
 const server = app.listen(port, () =>

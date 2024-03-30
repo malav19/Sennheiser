@@ -1,16 +1,29 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Navbar from "../components/User/Navbar";
-import img1 from "../assets/wire_earphone.jpeg";
 import AddressModal from "../components/Models/AddressModal";
 import PaymentModal from "../components/Models/PaymentModal";
+import Cart from "../components/Models/Cart";
+import axios from "axios";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { orderRoute } from "../utils/APIRoutes";
+import { useNavigate } from "react-router-dom";
+import Footar from "../components/User/Footar";
 
 const AddToCart = () => {
+  const navigate = useNavigate();
+  const [userData, setUserData] = useState(null);
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [modalHeaderAddress, setModalHeaderAddress] = useState("");
 
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [modalHeaderPayment, setModalHeaderPayment] = useState("");
+
+  const [cartItems, setCartItems] = useState([]);
+
+  const [paymentData, setPaymentData] = useState(null);
+  const [userSeenCardPage, setUserSeenCardPage] = useState(false);
 
   const openAddressModal = (header) => {
     setModalHeaderAddress(header);
@@ -21,49 +34,48 @@ const AddToCart = () => {
     setIsAddressModalOpen(false);
   };
 
-  const openPaymentModal = (header) => {
-    setModalHeaderPayment(header);
-    setIsPaymentModalOpen(true);
-  };
-
   const handleClosePaymentModal = () => {
     setIsPaymentModalOpen(false);
   };
-  const products = [
-    {
-      id: 1,
-      name: "Product Name 1",
-      quantity: 2,
-      price: 20,
-      image: img1,
-    },
-    {
-      id: 2,
-      name: "Product Name 2",
-      quantity: 3,
-      price: 25,
-      image: img1,
-    },
-    {
-      id: 3,
-      name: "Product Name 3",
-      quantity: 3,
-      price: 25,
-      image: img1,
-    },
-    {
-      id: 4,
-      name: "Product Name 4",
-      quantity: 3,
-      price: 25,
-      image: img1,
-    },
-  ];
 
-  const paymentMethod = {
-    name: "John Doe",
-    cardNumber: "1234567890123456",
+  useEffect(() => {
+    const storedUserData = JSON.parse(
+      localStorage.getItem("vibecheck-current-user")
+    );
+    if (storedUserData) {
+      setUserData(storedUserData);
+    } else {
+      console.log("User Data not found in sessionStorage.");
+    }
+  }, []);
+
+  useEffect(() => {
+    const storedPaymentData = JSON.parse(
+      sessionStorage.getItem("paymentFormData")
+    );
+    if (storedPaymentData) {
+      setPaymentData(storedPaymentData);
+    }
+  }, []);
+
+  useEffect(() => {
+    const hasSeenCardPage = JSON.parse(localStorage.getItem("hasSeenCardPage"));
+    if (hasSeenCardPage) {
+      setUserSeenCardPage(true);
+    }
+  }, []);
+
+  const handleSeenCardPage = () => {
+    localStorage.setItem("hasSeenCardPage", JSON.stringify(true));
+    setUserSeenCardPage(true);
   };
+
+  useEffect(() => {
+    const storedCartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+    if (storedCartItems) {
+      setCartItems(storedCartItems);
+    }
+  }, []);
 
   const maskedCardNumber = (cardNumber) => {
     const maskedPart = cardNumber.slice(0, 12).replace(/\d/g, "*");
@@ -71,108 +83,140 @@ const AddToCart = () => {
     return `${maskedPart} ${lastFourDigits}`;
   };
 
-  const total = products.reduce(
-    (acc, product) => acc + product.quantity * product.price,
-    0
-  );
+  const total = cartItems.reduce((acc, item) => {
+    const productPrice = item.product.product.price;
+    const subtotal = productPrice * item.quantity;
+    return acc + subtotal;
+  }, 0);
+
+  const handleProceedToPayment = async () => {
+    if (!userData) {
+      // Notify user to log in
+      toast.error("User Undefined !!", {
+        position: toast.POSITION.TOP_CENTER,
+      });
+      return;
+    }
+
+    if (!paymentData) {
+      // Notify user to add payment details
+      toast.error("Please add payment details.", {
+        position: toast.POSITION.TOP_CENTER,
+      });
+      return;
+    }
+
+    try {
+      // Prepare order data
+      const orderData = cartItems.map((item) => ({
+        userId: userData._id,
+        username: userData.username,
+        productName: item.product.product.productName,
+        price: item.product.product.price,
+        quantity: item.quantity,
+      }));
+
+      // Make a POST request to add orders
+      const response = await axios.post(orderRoute, orderData);
+      sessionStorage.removeItem("cartItems");
+
+      toast.success("Order placed successfully!", {
+        position: toast.POSITION.TOP_CENTER,
+        onClose: () => {
+          setTimeout(() => {
+            navigate("/");
+          }, 5000); // 5-second delay
+        },
+      });
+      console.log("Order placed successfully:", response.data);
+    } catch (error) {
+      toast.error("Error placing order. Please try again later.", {
+        position: toast.POSITION.TOP_CENTER,
+      });
+      console.error("Error placing order:", error);
+    }
+  };
 
   return (
     <>
       <Navbar />
-      <Container>
-        <OrderListContainer>
-          <OrderItem>
-            <Heading>My Cart</Heading>
-            <ThickLine />
-            <CartContent>
-              {products.map((product, index) => (
-                <React.Fragment key={product.id}>
-                  <ItemWrapper>
-                    <ItemImage src={product.image} alt="Product" />
-                    <ItemDetails>
-                      <ItemName>{product.name}</ItemName>
-                      <ItemQuantity>Quantity: {product.quantity}</ItemQuantity>
-                      <ItemPrice>Price: ${product.price}</ItemPrice>
-                    </ItemDetails>
-                  </ItemWrapper>
-                  {index !== products.length - 1 && <ThickLine />}
-                </React.Fragment>
-              ))}
-            </CartContent>
-          </OrderItem>
-          <ShippingAddressContainer>
-            <ShippingAddressHeading>Shipping Address:</ShippingAddressHeading>
-            <UserName>User Name</UserName>
-            <AddressLine>Address Line 1</AddressLine>
-            <AddressLine>Address Line 2</AddressLine>
-            <AddressLine>Address Line 3</AddressLine>
-            <ButtonContainer>
-              <AddAddressButton
-                onClick={() => openAddressModal("Add New Address")}
-              >
-                Add Address
-              </AddAddressButton>
-              <ChangeAddressButton
-                onClick={() => openAddressModal("Update Your Address")}
-              >
-                Change Address
-              </ChangeAddressButton>
-            </ButtonContainer>
-          </ShippingAddressContainer>
-        </OrderListContainer>
-        <PaymentSpecialContainer>
-          <PaymentMethodContainer>
-            <PaymentMethodHeading>Payment Method</PaymentMethodHeading>
-            <PaymentContent>
-              <PaymentDetail>
-                <PaymentLabel>Name: </PaymentLabel>
-                <PaymentValue>{paymentMethod.name}</PaymentValue>
-              </PaymentDetail>
-              <PaymentDetail>
-                <PaymentLabel>Card Number: </PaymentLabel>
-                <PaymentValue>
-                  {maskedCardNumber(paymentMethod.cardNumber)}
-                </PaymentValue>
-              </PaymentDetail>
-              <AddPaymentButton
-                onClick={() => openPaymentModal("Add New Payment")}
-              >
-                Add Payment Method
-              </AddPaymentButton>
-              <ChangePaymentButton
-                onClick={() => openPaymentModal("Update Your Payment")}
-              >
-                Change Payment Method
-              </ChangePaymentButton>
-            </PaymentContent>
-          </PaymentMethodContainer>
-          <SpecialInstructionContainer>
-            <SpecialInstructionHeading>
-              Special Instructions
-            </SpecialInstructionHeading>
-            <SpecialInstructionContent>
-              <div>
-                <SpecialInstructionLabel>
-                  Add Special Instruction:
-                </SpecialInstructionLabel>
-                <SpecialInstructionValue>
-                  {/* Your special instruction content */}
-                </SpecialInstructionValue>
-              </div>
-              <div>
-                <SpecialInstructionLabel>Add Note:</SpecialInstructionLabel>
-                <SpecialInstructionValue>
-                  {/* Your note content */}
-                </SpecialInstructionValue>
-              </div>
-            </SpecialInstructionContent>
-          </SpecialInstructionContainer>
-          <TotalContainer>
-            <TotalHeading>Total: ${total}</TotalHeading>
-            <ProceedButton>Proceed to Payment</ProceedButton>
-          </TotalContainer>
-        </PaymentSpecialContainer>
-      </Container>
+      <PageContainer>
+        <Container>
+          <OrderListContainer>
+            <Cart
+              cartItems={cartItems}
+              onRemoveFromCart={(index) => {
+                const updatedCartItems = [...cartItems];
+                updatedCartItems.splice(index, 1);
+                setCartItems(updatedCartItems);
+                localStorage.setItem(
+                  "cartItems",
+                  JSON.stringify(updatedCartItems)
+                );
+              }}
+            />
+          </OrderListContainer>
+          <PaymentSpecialContainer>
+            <AddressBox>
+              <ShippingAddressHeading>Shipping Address:</ShippingAddressHeading>
+              <UserName>User Name</UserName>
+              <AddressLine>Address Line 1</AddressLine>
+              <AddressLine>Address Line 2</AddressLine>
+              <AddressLine>Address Line 3</AddressLine>
+              <ButtonContainer>
+                <AddAddressButton
+                  onClick={() => openAddressModal("Add New Address")}
+                >
+                  Add Address
+                </AddAddressButton>
+                <ChangeAddressButton
+                  onClick={() => openAddressModal("Update Your Address")}
+                >
+                  Change Address
+                </ChangeAddressButton>
+              </ButtonContainer>
+            </AddressBox>
+
+            <PaymentMethodContainer>
+              <PaymentMethodHeading>Payment Method</PaymentMethodHeading>
+              <PaymentContent>
+                {!userSeenCardPage ? (
+                  <p onClick={handleSeenCardPage}>
+                    Click here to see your payment details
+                  </p>
+                ) : (
+                  <>
+                    <PaymentDetail>
+                      <PaymentLabel>Name: </PaymentLabel>
+                      <PaymentValue>
+                        {paymentData && paymentData.nameOnCard}
+                      </PaymentValue>
+                    </PaymentDetail>
+                    <PaymentDetail>
+                      <PaymentLabel>Card Number: </PaymentLabel>
+                      <PaymentValue>
+                        {paymentData &&
+                          maskedCardNumber(paymentData.cardNumber)}
+                      </PaymentValue>
+                    </PaymentDetail>
+                  </>
+                )}
+                <AddPaymentButton onClick={() => setIsPaymentModalOpen(true)}>
+                  Payment Method
+                </AddPaymentButton>
+              </PaymentContent>
+            </PaymentMethodContainer>
+
+            <TotalContainer>
+              <TotalHeading>Total: ${total}</TotalHeading>
+              <ProceedButton onClick={handleProceedToPayment}>
+                Proceed to Payment
+              </ProceedButton>
+            </TotalContainer>
+          </PaymentSpecialContainer>
+        </Container>
+        <Footar />
+      </PageContainer>
       <AddressModal
         isOpen={isAddressModalOpen}
         onClose={handleCloseModal}
@@ -187,80 +231,22 @@ const AddToCart = () => {
   );
 };
 
+const PageContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+`;
+
 const Container = styled.div`
   display: flex;
   gap: 2rem;
   padding: 2rem;
+  flex: 1; /* Make the container take remaining vertical space */
 `;
 
 const OrderListContainer = styled.div`
   flex: 0 0 auto;
   width: 400px;
-`;
-
-const OrderItem = styled.div`
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 1rem;
-  margin-bottom: 1rem;
-`;
-
-const Heading = styled.h2`
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-`;
-
-const ThickLine = styled.div`
-  width: 100%;
-  height: 2px;
-  background-color: #ccc;
-  margin-bottom: 1rem;
-`;
-
-const CartContent = styled.div`
-  height: 400px; /* Set a fixed height */
-  overflow-y: auto; /*  padding-right: 16px; /* Adjust for scrollbar width */
-`;
-
-const ItemWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  padding-bottom: 1rem;
-  &:last-child {
-    padding-bottom: 0;
-  }
-`;
-
-const ItemImage = styled.img`
-width: 150px;
-    height: 150px;
-  margin-right: 1rem;
-`;
-
-const ItemDetails = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const ItemName = styled.p`
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-`;
-
-const ItemQuantity = styled.p`
-  font-size: 0.9rem;
-  margin-bottom: 0.5rem;
-`;
-
-const ItemPrice = styled.p`
-  font-size: 0.9rem;
-`;
-
-const ShippingAddressContainer = styled.div`
-  padding: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  flex: 1;
 `;
 
 const ShippingAddressHeading = styled.h2`
@@ -307,12 +293,21 @@ const PaymentSpecialContainer = styled.div`
   flex: 1;
 `;
 
+const AddressBox = styled.div`
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  height: auto;
+  overflow-y: auto;
+`;
+
 const PaymentMethodContainer = styled.div`
   padding: 1rem;
   border: 1px solid #ccc;
   border-radius: 8px;
-  height: auto; /* Remove fixed height */
+  height: auto;
   overflow-y: auto;
+  margin-top: 1rem;
 `;
 
 const AddPaymentButton = styled.button`
@@ -324,16 +319,6 @@ const AddPaymentButton = styled.button`
   cursor: pointer;
   margin-bottom: 0.5rem;
   margin-right: 0.5rem; /* Add right margin */
-`;
-
-const ChangePaymentButton = styled.button`
-  padding: 0.5rem 1rem;
-  background-color: #28a745;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-bottom: 0.5rem;
 `;
 
 const PaymentMethodHeading = styled.h2`
@@ -357,33 +342,6 @@ const PaymentLabel = styled.span`
 `;
 
 const PaymentValue = styled.span`
-  word-break: break-all;
-`;
-
-const SpecialInstructionContainer = styled.div`
-  padding: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  margin-top: 2rem;
-  height: 200px;
-  overflow-y: auto;
-`;
-
-const SpecialInstructionHeading = styled.h2`
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-`;
-
-const SpecialInstructionContent = styled.div`
-  margin-top: 1rem;
-`;
-
-const SpecialInstructionLabel = styled.span`
-  font-weight: bold;
-  margin-right: 0.5rem;
-`;
-
-const SpecialInstructionValue = styled.span`
   word-break: break-all;
 `;
 

@@ -47,7 +47,7 @@ export default function Login() {
     console.log("values ", values);
     if (validateForm()) {
       const { username, password } = values;
-      // If not an admin, perform the regular login logic
+
       const { data } = await axios.post(loginRoute, {
         username,
         password,
@@ -149,19 +149,23 @@ const FormContainer = styled.div`
     }
   }
   button {
-    background: linear-gradient(to right, #f472b6, #60a5fa);
-    color: white;
-    padding: 1rem 2rem;
-    border: 0.1rem solid rgb(240 239 243);
-    font-weight: bold;
-    cursor: pointer;
-    border-radius: 0.4rem;
-    font-size: 1rem;
-    text-transform: uppercase;
-    &:hover {
-      background-color: #006622;
-    }
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(to right, #f472b6, #60a5fa);
+  color: white;
+  padding: 1rem 2rem;
+  border: 0.1rem solid rgb(240 239 243);
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 0.4rem;
+  font-size: 1rem;
+  text-transform: uppercase;
+  &:hover {
+    background-color: #006622;
   }
+}
+
   span {
     color: black;
     text-transform: uppercase;

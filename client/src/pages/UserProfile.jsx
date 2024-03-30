@@ -7,6 +7,12 @@ import { useNavigate } from "react-router-dom";
 import { logoutRoute } from "../utils/APIRoutes";
 import axios from "axios";
 const UserProfile = () => {
+  const storedUserData = JSON.parse(
+    localStorage.getItem("vibecheck-current-user")
+  );
+
+  const userType = storedUserData.userType;
+
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [modalHeaderAddress, setModalHeaderAddress] = useState("");
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
@@ -51,30 +57,35 @@ const UserProfile = () => {
           <Detail>Name: John Doe</Detail>
           <Detail>Email: john@example.com</Detail>
         </UserInfo>
-        <Separator />
-        <SectionContainer>
-          <SectionTitle>Shipping Address:</SectionTitle>
-          <ChangeAddressButton
-            onClick={() => handleButtonClick("Update your Address:")}
-          >
-            Change Address
-          </ChangeAddressButton>
-        </SectionContainer>
-        <UserAddress>
-          <UserName>User Name</UserName>
-          <AddressLine>Address Line 1</AddressLine>
-          <AddressLine>Address Line 2</AddressLine>
-          <AddressLine>Address Line 3</AddressLine>
-        </UserAddress>
-        <AddressModal
-          isOpen={isAddressModalOpen}
-          onClose={handleCloseModal}
-          headerText={modalHeaderAddress}
-        />
-        <EditProfile
-          isOpen={isEditModalOpen}
-          onClose={handleCloseEditProfileModal}
-        />
+
+        {userType !== "admin" && (
+          <>
+            <Separator />
+            <SectionContainer>
+              <SectionTitle>Shipping Address:</SectionTitle>
+              <ChangeAddressButton
+                onClick={() => handleButtonClick("Update your Address:")}
+              >
+                Change Address
+              </ChangeAddressButton>
+            </SectionContainer>
+            <UserAddress>
+              <UserName>User Name</UserName>
+              <AddressLine>Address Line 1</AddressLine>
+              <AddressLine>Address Line 2</AddressLine>
+              <AddressLine>Address Line 3</AddressLine>
+            </UserAddress>
+            <AddressModal
+              isOpen={isAddressModalOpen}
+              onClose={handleCloseModal}
+              headerText={modalHeaderAddress}
+            />
+            <EditProfile
+              isOpen={isEditModalOpen}
+              onClose={handleCloseEditProfileModal}
+            />
+          </>
+        )}
       </Container>
       {!isEditModalOpen && !isAddressModalOpen && (
         <LogoutButton onClick={handleLogout}>Logout</LogoutButton>

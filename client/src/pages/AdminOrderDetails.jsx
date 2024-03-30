@@ -1,64 +1,57 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
-import Sidebar from "../components/Admin/Sidebar";
+import Navbar from "../components/User/Navbar";
+import axios from "axios";
+import Footar from "../components/User/Footar";
 
 export default function AdminOrderDetails() {
-  const navigate = useNavigate();
-  const handleLogout = () => {
-    navigate("/login");
+  const [orders, setOrders] = useState([]);
+
+  useEffect(() => {
+    getOrders();
+  }, []);
+
+  const getOrders = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:8081/api/order/getOrders"
+      );
+
+      setOrders(response.data);
+    } catch (error) {
+      console.error("Error fetching orders: ", error);
+    }
   };
-
-  const orders = [
-    {
-      id: 2,
-      orderNumber: "456",
-      customerName: "Jane Doe",
-      date: "2024-03-04",
-      total: 150.0,
-      status: "Shipped",
-    },
-    // Add more orders as needed
-  ];
-
   return (
-    <Container>
-      <Sidebar handleLogout={handleLogout} />
-
-      <MainContent>
-        <h2>Order Details</h2>
-        <ColumnNames>
-          <div>Order Number</div>
-          <div>Customer Name</div>
-          <div>Date</div>
-          <div>Total</div>
-          <div>Status</div>
-        </ColumnNames>
-        {orders.map((order) => (
-          <OrderSquare key={order.id}>
-            <ColumnValues>
-              <div>{order.orderNumber}</div>
-              <div>{order.customerName}</div>
-              <div>{order.date}</div>
-              <div>{order.total}</div>
-              <div>{order.status}</div>
-            </ColumnValues>
-          </OrderSquare>
-        ))}
-      </MainContent>
-    </Container>
+    <>
+      <Navbar />
+      <Container>
+        <MainContent>
+          <h2>Order Details</h2>
+          <ColumnNames>
+            <div>Number</div>
+            <div>Customer Name</div>
+            <div>Product Name</div>
+            <div>Total</div>
+            <div>Quantity</div>
+          </ColumnNames>
+          {orders.map((order, index) => (
+            <OrderSquare key={order.id}>
+              <ColumnValues>
+                <div>{index + 1}</div>
+                <div>{order.username}</div>
+                <div>{order.productName}</div>
+                <div>{order.price}</div>
+                <div>{order.quantity}</div>
+              </ColumnValues>
+            </OrderSquare>
+          ))}
+        </MainContent>
+      </Container>
+      <Footar />
+    </>
   );
 }
-
-const linkStyle = {
-  textDecoration: "none",
-  color: "green",
-
-  ":hover": {
-    color: "white",
-    backgroundColor: "darkgreen",
-  },
-};
 
 const OrderSquare = styled.div`
   border: 1px solid #ddd;
@@ -66,7 +59,7 @@ const OrderSquare = styled.div`
   margin: 10px;
   display: grid;
   grid-template-rows: 1fr;
-  gap: 10px;
+  gap: 8px;
 `;
 
 const ColumnNames = styled.div`
@@ -75,11 +68,13 @@ const ColumnNames = styled.div`
   font-weight: bold;
   margin-bottom: 10px;
   margin: 3px;
+  text-align: center;
 `;
 
 const ColumnValues = styled.div`
   display: grid;
   grid-template-columns: repeat(5, 1fr);
+  text-align: center;
 `;
 
 const Container = styled.div`

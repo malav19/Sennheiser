@@ -80,15 +80,48 @@ const FormContainer = styled.div`
   justify-content: center;
   gap: 1rem;
   align-items: center;
-  background-color: linear-gradient(to right, rgb(244, 114, 182), rgb(96, 165, 250));
+  background-color: rgb(247, 247, 251);
 
   form {
     display: flex;
     flex-direction: column;
     gap: 2rem;
-    background-color: linear-gradient(to right, rgb(244, 114, 182), rgb(96, 165, 250));
+    background-color: #fff;
     border-radius: 2rem;
-    padding: 5rem;
+    padding: 3rem 5rem;
+    border: 0.1rem solid rgb(240, 239, 243);
+  }
+
+  input {
+    background-color: transparent;
+    padding: 1rem;
+    border: 0.1rem solid rgb(240, 239, 243);
+    border-radius: 0.4rem;
+    color: black;
+    width: 100%;
+    font-size: 1rem;
+    &:focus {
+      border: 0.1rem solid #997af0;
+      outline: none;
+    }
+  }
+
+  button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(to right, #f472b6, #60a5fa);
+    color: white;
+    padding: 1rem 2rem;
+    border: 0.1rem solid rgb(240, 239, 243);
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 0.4rem;
+    font-size: 1rem;
+    text-transform: uppercase;
+    &:hover {
+      background-color: #006622;
+    }
   }
 
   span {
