@@ -16,8 +16,8 @@ export default function AdminCustomer() {
       const response = await axios.get(
         "http://localhost:8081/api/auth/getUsers"
       );
-
       setUsers(response.data);
+      console.log("Getting the customer list ", response.data);
     } catch (error) {
       console.error("Error fetching users: ", error);
     }
@@ -32,6 +32,8 @@ export default function AdminCustomer() {
             <div>Number</div>
             <div>Customer Name</div>
             <div>Email Address</div>
+            <div>Address</div>
+            <div>Phone Number</div>
           </ColumnNames>
           {users.map((customer, index) => (
             <OrderSquare key={customer._id}>
@@ -39,6 +41,14 @@ export default function AdminCustomer() {
                 <div>{index + 1}</div>
                 <div>{customer.username}</div>
                 <div>{customer.email}</div>
+                <div>
+                  {customer.address ? customer.address.city : "Not available"}
+                </div>
+                <div>
+                  {customer.address
+                    ? customer.address.phoneNumber
+                    : "Not available"}
+                </div>
               </ColumnValues>
             </OrderSquare>
           ))}

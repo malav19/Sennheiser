@@ -87,12 +87,12 @@ const ProductDetailPage = () => {
             <DescriptionContainer>
               <h3>Description:</h3>
               <p>{product.product.description}</p>
-              <h3>Features:</h3>
+              {/* <h3>Features:</h3>
               <ul>
                 {product.product.features.map((feature, index) => (
                   <li key={index}>{feature}</li>
                 ))}
-              </ul>
+              </ul> */}
             </DescriptionContainer>
             <HorizontalLine />
           </ContentContainer>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Navbar from "../components/User/Navbar";
 import EditProfile from "../components/Models/EditProfile";
@@ -17,6 +17,17 @@ const UserProfile = () => {
   const [modalHeaderAddress, setModalHeaderAddress] = useState("");
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const navigate = useNavigate();
+  const [userData, setUserData] = useState({});
+  useEffect(() => {
+    // Fetch username and email from local storage
+    const storedUserData = JSON.parse(
+      localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
+    );
+    if (storedUserData) {
+      setUserData(storedUserData);
+    }
+  }, []); // Empty dependency array ensures useEffect runs only once after initial render
+
   const handleLogout = async () => {
     const id = await JSON.parse(
       localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
@@ -28,7 +39,7 @@ const UserProfile = () => {
     }
   };
 
-  const handleEditProfileClick = () => {
+  const handleEditProfileClick = async (e) => {
     setIsEditModalOpen(true);
   };
 
@@ -54,10 +65,29 @@ const UserProfile = () => {
           <EditButton onClick={handleEditProfileClick}>Edit Profile</EditButton>
         </Header>
         <UserInfo>
-          <Detail>Name: John Doe</Detail>
-          <Detail>Email: john@example.com</Detail>
+          <Detail
+            value={userData.username}
+            onChange={(e) =>
+              setUserData({
+                ...userData,
+                username: e.target.value,
+              })
+            }
+          >
+            Name:{userData.username}
+          </Detail>
+          <Detail
+            value={userData.email}
+            onChange={(e) =>
+              setUserData({
+                ...userData,
+                email: e.target.value,
+              })
+            }
+          >
+            Email:{userData.email}
+          </Detail>
         </UserInfo>
-
         {userType !== "admin" && (
           <>
             <Separator />
@@ -70,10 +100,14 @@ const UserProfile = () => {
               </ChangeAddressButton>
             </SectionContainer>
             <UserAddress>
-              <UserName>User Name</UserName>
-              <AddressLine>Address Line 1</AddressLine>
-              <AddressLine>Address Line 2</AddressLine>
-              <AddressLine>Address Line 3</AddressLine>
+              {userData.address ? (
+                <AddressLine>
+                  Address: {userData.address.street}, {userData.address.city},{" "}
+                  {userData.address.state}, {userData.address.pincode}
+                </AddressLine>
+              ) : (
+                <div>Not Available</div>
+              )}
             </UserAddress>
             <AddressModal
               isOpen={isAddressModalOpen}
@@ -150,9 +184,9 @@ const SectionTitle = styled.h2`
 
 const UserAddress = styled.div``;
 
-const UserName = styled.p`
-  font-size: 1rem;
-`;
+// const UserName = styled.p`
+//   font-size: 1rem;
+// `;
 
 const AddressLine = styled.p`
   font-size: 1rem;

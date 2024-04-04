@@ -7,7 +7,7 @@ const multer = require("multer");
 module.exports.addProducts = async (req, res) => {
   try {
     // const storage = multer({ storage: storage });
-    const { productNumber, productName, price, status, description, features, image } = req.body;
+    const { productNumber, productName, price, status, description, image } = req.body;
     console.log("add products body", req.body);
     // const product = new Product({ productNumber,productName,date, price, status });
     // await product.save();
@@ -27,8 +27,7 @@ module.exports.addProducts = async (req, res) => {
         image: img,
         price,
         status,
-        description,
-        features: []
+        description
       }
     });
     console.log("data", data);
@@ -88,13 +87,14 @@ module.exports.updateProduct = async (req, res) => {
     console.log("img ", img);
     const finalProduct = { ...product, image: img };
     console.log("final Product ", finalProduct);
+
     // const data = await Product.updateOne({ product });
     const data = await Product.findByIdAndUpdate(
       { _id },
       { $set: { "product": finalProduct } });
     // .updateOne({ _id: product._id }, product);
     console.log("data", data);
-    if (data) return res.json({ message: 'Product updated successfully', status: true });
+    if (data) return res.json({ message: 'Product updated successfully', status: true, data });
     else return res.json({ msg: "Failed to update product to the database", status: false });
   } catch (error) {
     res.status(500).json({ error: error.message });

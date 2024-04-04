@@ -1,6 +1,7 @@
 const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
 
+const mongoose = require("mongoose");
 module.exports.login = async (req, res, next) => {
   try {
     const { username, password } = req.body;
@@ -91,11 +92,82 @@ module.exports.forgotPassword = async (req, res, next) => {
 
 module.exports.getUsers = async (req, res) => {
   try {
+
+    const users = await User.find({ userType: 'user' });
+
+    return res.json(users);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+module.exports.getAllUsers = async (req, res) => {
+  try {
+
     const users = await User.find();
 
     return res.json(users);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server Error" });
+  }
+};
+
+
+module.exports.updateUser = async (req, res) => {
+  try {
+    const { id, username, email } = req.body;
+    const user = await User.findOne({ username });
+    let objectId;
+    // Convert id to ObjectId if it's a string
+    if (typeof id === 'string') {
+      console.log("id", id);
+      objectId = new mongoose.Types.ObjectId(id);
+    }
+    const data = await User.findByIdAndUpdate(
+      objectId || id,
+      { $set: { "username": username, "email": email } },
+      { new: true });
+    console.log("data", data);
+    if (data) {
+      return res.json({ status: true, data });
+    } else return res.json({ msg: "Failed to update user to the database", status: false });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports.addUserAddress = async (req, res) => {
+  try {
+    const { id, username, phoneNumber,
+      street,
+      city,
+      state,
+      pincode } = req.body;
+    console.log("User Address--", req.body);
+    let objectId;
+    // Convert id to ObjectId if it's a string
+    if (typeof id === 'string') {
+      console.log("id", id);
+      objectId = new mongoose.Types.ObjectId(id);
+    }
+    const updateQuery = {
+      $set: {
+        "address.phoneNumber": phoneNumber,
+        "address.street": street,
+        "address.city": city,
+        "address.state": state,
+        "address.pincode": pincode
+      }
+    };
+    const data = await User.findByIdAndUpdate(objectId || id, updateQuery, { new: true });
+    // const user = await User.findOne({ username });
+    if (data) return res.json({ status: true, data });
+    else return res.json({ msg: "Failed to add address to the database", status: false });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
   }
 };
