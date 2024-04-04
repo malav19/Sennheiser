@@ -53,7 +53,7 @@ export default function Login() {
         password,
       });
       console.log("User Type", data);
-      const page = data.user.userType === "user" ? "/" : "/admin/products";
+
       if (data.status === false) {
         toast.error(data.msg, toastOptions);
       }
@@ -62,7 +62,7 @@ export default function Login() {
           process.env.REACT_APP_LOCALHOST_KEY,
           JSON.stringify(data.user)
         );
-
+        const page = data.user.userType === "user" ? "/" : "/admin/products";
         navigate(page);
       }
     }

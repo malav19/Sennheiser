@@ -3,10 +3,10 @@ import styled from "styled-components";
 import Navbar from "../components/User/Navbar";
 import axios from "axios";
 import Footar from "../components/User/Footar";
-
+import { useNavigate } from "react-router";
 export default function AdminOrderDetails() {
   const [orders, setOrders] = useState([]);
-
+  const navigate = useNavigate();
   useEffect(() => {
     getOrders();
   }, []);

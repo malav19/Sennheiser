@@ -1,7 +1,38 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { Form } from "react-bootstrap";
 import styled from "styled-components";
-
+import axios from "axios";
+import { updateUserRoute } from "../../utils/APIRoutes";
 const EditProfile = ({ isOpen, onClose }) => {
+  const [userData, setUserData] = useState({ username: "", email: "", id: "" });
+  useEffect(() => {
+    const storedUserData = JSON.parse(
+      localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
+    );
+
+    if (storedUserData && storedUserData._id) {
+      setUserData((prevUserData) => ({
+        ...prevUserData,
+        id: storedUserData._id,
+      }));
+    }
+  }, []);
+  const handleSubmitEditProfile = async (e) => {
+    // e.preventDefault();
+    try {
+      const { data } = await axios.put(updateUserRoute, userData);
+      if (data.status === true) {
+        localStorage.setItem(
+          process.env.REACT_APP_LOCALHOST_KEY,
+          JSON.stringify(data.data)
+        );
+      }
+      alert("Form data saved successfully");
+    } catch (error) {
+      console.error("Error saving form data:", error);
+      alert("Error saving form data. Please try again later.");
+    }
+  };
   return (
     <>
       {isOpen && (
@@ -11,15 +42,33 @@ const EditProfile = ({ isOpen, onClose }) => {
             <ModalSubHeader>
               Make changes to your profile here. Click save when you're done.
             </ModalSubHeader>
-            <Form>
-              <FormGroup>
-                <Label>Name:</Label>
-                <Input type="text" />
-              </FormGroup>
-              <FormGroup>
-                <Label>Email:</Label>
-                <Input type="email" />
-              </FormGroup>
+            <Form onSubmit={handleSubmitEditProfile}>
+              <Form.Group controlId="username">
+                <Form.Label>User Name</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={userData.username}
+                  onChange={(e) =>
+                    setUserData({
+                      ...userData,
+                      username: e.target.value,
+                    })
+                  }
+                />
+              </Form.Group>
+              <Form.Group controlId="email">
+                <Form.Label>Email</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={userData.email}
+                  onChange={(e) =>
+                    setUserData({
+                      ...userData,
+                      email: e.target.value,
+                    })
+                  }
+                />
+              </Form.Group>
               <SaveButton>Save Changes</SaveButton>
             </Form>
           </ModalContent>
@@ -59,30 +108,6 @@ const ModalHeader = styled.h2`
 const ModalSubHeader = styled.p`
   color: #888;
   margin-bottom: 1.5rem;
-`;
-
-const Form = styled.form`
-  width: 80%;
-`;
-
-const FormGroup = styled.div`
-  display: flex;
-  align-items: center;
-  margin-bottom: 1rem;
-`;
-
-const Label = styled.label`
-  font-size: 1rem;
-  font-weight: bold;
-  flex: 1;
-`;
-
-const Input = styled.input`
-  flex: 2;
-  padding: 0.5rem;
-  font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 20px; /* Curved border */
 `;
 
 const SaveButton = styled.button`

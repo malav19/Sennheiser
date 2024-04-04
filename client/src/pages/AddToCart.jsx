@@ -13,7 +13,18 @@ import Footar from "../components/User/Footar";
 
 const AddToCart = () => {
   const navigate = useNavigate();
-  const [userData, setUserData] = useState(null);
+  // const [userData, setUserData] = useState(null);
+  const [userData, setUserData] = useState({});
+  useEffect(() => {
+    // Fetch username and email from local storage
+    const storedUserData = JSON.parse(
+      localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
+    );
+    if (storedUserData) {
+      setUserData(storedUserData);
+      console.log("Username", userData.address);
+    }
+  }, []);
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [modalHeaderAddress, setModalHeaderAddress] = useState("");
 
@@ -98,7 +109,7 @@ const AddToCart = () => {
       return;
     }
 
-    if (!paymentData) {
+    if (!paymentData && !userData.address) {
       // Notify user to add payment details
       toast.error("Please add payment details.", {
         position: toast.POSITION.TOP_CENTER,
@@ -118,7 +129,7 @@ const AddToCart = () => {
 
       // Make a POST request to add orders
       const response = await axios.post(orderRoute, orderData);
-      sessionStorage.removeItem("cartItems");
+      localStorage.removeItem("cartItems");
 
       toast.success("Order placed successfully!", {
         position: toast.POSITION.TOP_CENTER,
@@ -140,83 +151,103 @@ const AddToCart = () => {
   return (
     <>
       <Navbar />
-      <PageContainer>
-        <Container>
-          <OrderListContainer>
-            <Cart
-              cartItems={cartItems}
-              onRemoveFromCart={(index) => {
-                const updatedCartItems = [...cartItems];
-                updatedCartItems.splice(index, 1);
-                setCartItems(updatedCartItems);
-                localStorage.setItem(
-                  "cartItems",
-                  JSON.stringify(updatedCartItems)
-                );
-              }}
-            />
-          </OrderListContainer>
-          <PaymentSpecialContainer>
-            <AddressBox>
-              <ShippingAddressHeading>Shipping Address:</ShippingAddressHeading>
-              <UserName>User Name</UserName>
-              <AddressLine>Address Line 1</AddressLine>
-              <AddressLine>Address Line 2</AddressLine>
-              <AddressLine>Address Line 3</AddressLine>
-              <ButtonContainer>
-                <AddAddressButton
-                  onClick={() => openAddressModal("Add New Address")}
-                >
-                  Add Address
-                </AddAddressButton>
-                <ChangeAddressButton
-                  onClick={() => openAddressModal("Update Your Address")}
-                >
-                  Change Address
-                </ChangeAddressButton>
-              </ButtonContainer>
-            </AddressBox>
-
-            <PaymentMethodContainer>
-              <PaymentMethodHeading>Payment Method</PaymentMethodHeading>
-              <PaymentContent>
-                {!userSeenCardPage ? (
-                  <p onClick={handleSeenCardPage}>
-                    Click here to see your payment details
-                  </p>
+      {cartItems.length != 0 ? (
+        <PageContainer>
+          <Container>
+            <OrderListContainer>
+              <Cart
+                cartItems={cartItems}
+                onRemoveFromCart={(index) => {
+                  const updatedCartItems = [...cartItems];
+                  updatedCartItems.splice(index, 1);
+                  setCartItems(updatedCartItems);
+                  localStorage.setItem(
+                    "cartItems",
+                    JSON.stringify(updatedCartItems)
+                  );
+                }}
+              />
+            </OrderListContainer>
+            <PaymentSpecialContainer>
+              <AddressBox>
+                <ShippingAddressHeading>
+                  Shipping Address:
+                </ShippingAddressHeading>
+                {userData.address ? (
+                  <AddressLine>
+                    Address: {userData.address.street}, {userData.address.city},{" "}
+                    {userData.address.state}, {userData.address.pincode}
+                  </AddressLine>
                 ) : (
-                  <>
-                    <PaymentDetail>
-                      <PaymentLabel>Name: </PaymentLabel>
-                      <PaymentValue>
-                        {paymentData && paymentData.nameOnCard}
-                      </PaymentValue>
-                    </PaymentDetail>
-                    <PaymentDetail>
-                      <PaymentLabel>Card Number: </PaymentLabel>
-                      <PaymentValue>
-                        {paymentData &&
-                          maskedCardNumber(paymentData.cardNumber)}
-                      </PaymentValue>
-                    </PaymentDetail>
-                  </>
+                  <h2>Not Available</h2>
                 )}
-                <AddPaymentButton onClick={() => setIsPaymentModalOpen(true)}>
-                  Payment Method
-                </AddPaymentButton>
-              </PaymentContent>
-            </PaymentMethodContainer>
+                <ButtonContainer>
+                  <AddAddressButton
+                    onClick={() => openAddressModal("Add New Address")}
+                  >
+                    Add Address
+                  </AddAddressButton>
+                  <ChangeAddressButton
+                    onClick={() => openAddressModal("Update Your Address")}
+                  >
+                    Change Address
+                  </ChangeAddressButton>
+                </ButtonContainer>
+              </AddressBox>
 
-            <TotalContainer>
-              <TotalHeading>Total: ${total}</TotalHeading>
-              <ProceedButton onClick={handleProceedToPayment}>
-                Proceed to Payment
-              </ProceedButton>
-            </TotalContainer>
-          </PaymentSpecialContainer>
-        </Container>
-        <Footar />
-      </PageContainer>
+              <PaymentMethodContainer>
+                <PaymentMethodHeading>Payment Method</PaymentMethodHeading>
+                <PaymentContent>
+                  {!userSeenCardPage ? (
+                    <p onClick={handleSeenCardPage}>
+                      Click here to see your payment details
+                    </p>
+                  ) : (
+                    <>
+                      <PaymentDetail>
+                        <PaymentLabel>Name: </PaymentLabel>
+                        <PaymentValue>
+                          {paymentData && paymentData.nameOnCard}
+                        </PaymentValue>
+                      </PaymentDetail>
+                      <PaymentDetail>
+                        <PaymentLabel>Card Number: </PaymentLabel>
+                        <PaymentValue>
+                          {paymentData &&
+                            maskedCardNumber(paymentData.cardNumber)}
+                        </PaymentValue>
+                      </PaymentDetail>
+                    </>
+                  )}
+                  <AddPaymentButton onClick={() => setIsPaymentModalOpen(true)}>
+                    Payment Method
+                  </AddPaymentButton>
+                </PaymentContent>
+              </PaymentMethodContainer>
+
+              <TotalContainer>
+                <TotalHeading>Total: ${total}</TotalHeading>
+                <ProceedButton onClick={handleProceedToPayment}>
+                  Proceed to Payment
+                </ProceedButton>
+              </TotalContainer>
+            </PaymentSpecialContainer>
+          </Container>
+          <Footar />
+        </PageContainer>
+      ) : (
+        <h1
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100vh",
+            textAlign: "center",
+          }}
+        >
+          Your cart is empty!! Please choose your order !!
+        </h1>
+      )}
       <AddressModal
         isOpen={isAddressModalOpen}
         onClose={handleCloseModal}

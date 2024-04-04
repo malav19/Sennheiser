@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -9,15 +10,60 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import Logo from "../../assets/Vibe.png";
+import Contact from "./../../pages/Contact";
 
 const Navbar = ({ setSearchQuery }) => {
-  const storedUserData = JSON.parse(
-    localStorage.getItem("vibecheck-current-user")
-  );
-
-  const userType = storedUserData.userType;
+  const [userType, setUserType] = useState("");
+  const navigate = useNavigate();
+  useEffect(() => {
+    const storedUserData = JSON.parse(
+      localStorage.getItem("vibecheck-current-user")
+    );
+    // console.log("stored user data ", storedUserData);
+    // if (storedUserData === null || typeof storedUserData === "undefined") {
+    //   navigate("/");
+    // } else {
+    if (storedUserData?.userType) {
+      setUserType(storedUserData.userType);
+    }
+    //   if (storedUserData.userType === "admin") {
+    //     navigate("/admin/products");
+    //   } else if (storedUserData.userType === "user") {
+    //     navigate("/");
+    //   }
+    // }
+  }, []);
   const location = useLocation();
   const showSearchBar = location.pathname.startsWith("/products");
+
+  // const Navbar = () => {
+  //   const navigate = useNavigate();
+  //   const handleCart = async (e) => {
+  //     const storedUserData = JSON.parse(
+  //       localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
+  //     );
+  //     console.log("in handle cart ", storedUserData);
+  //     if (storedUserData) {
+  //       console.log("navigating to cart");
+  //       window.location.href = "/cart";
+  //     } else {
+  //       window.location.href = "/";
+  //     }
+  //   };
+
+  // const CartIcon = () => {
+  //   const handleClick = () => {
+  //     navigate("/cart");
+  //   };
+
+  //   return (
+  //     <IconLink onClick={handleClick}>
+  //       <IconCircle>
+  //         <FontAwesomeIcon icon={faShoppingCart} />
+  //       </IconCircle>
+  //     </IconLink>
+  //   );
+  // };
 
   return (
     <NavContainer>
@@ -26,7 +72,6 @@ const Navbar = ({ setSearchQuery }) => {
       </LogoContainer>
 
       <NavLinkContainer>
-        <NavLink to="/">Home</NavLink>
         {userType === "admin" ? (
           <>
             <NavLink to="/admin/products">Products</NavLink>
@@ -36,8 +81,10 @@ const Navbar = ({ setSearchQuery }) => {
           </>
         ) : (
           <>
+            <NavLink to="/">Home</NavLink>
             <NavLink to="/products/*">Products</NavLink>
             <NavLink to="/about">About Us</NavLink>
+            <NavLink to="/contact">Contact Us</NavLink>
           </>
         )}
       </NavLinkContainer>
@@ -51,7 +98,6 @@ const Navbar = ({ setSearchQuery }) => {
                   placeholder="Search products..."
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <SearchButton type="button">Search</SearchButton>
               </SearchContainer>
             </>
           )}
@@ -64,6 +110,7 @@ const Navbar = ({ setSearchQuery }) => {
             </IconLink>
 
             <IconLink to="/cart">
+              {/* // onClick={handleCart}> */}
               <IconCircle>
                 <FontAwesomeIcon icon={faShoppingCart} />
               </IconCircle>

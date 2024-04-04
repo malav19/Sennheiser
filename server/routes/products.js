@@ -11,10 +11,18 @@ const storage = multer.diskStorage({
     },
 });
 const upload = multer({ storage: storage });
-
+// Middleware to check if the user is an admin
+// const isAdmin = (req, res, next) => {
+//     const userType = req.headers['usertype']; // Assuming usertype is sent in the request headers
+//     if (userType === 'admin') {
+//         next(); // Allow access to the route
+//     } else {
+//         res.status(403).send('Unauthorized'); // User is not an admin
+//     }
+// };, isAdmin
 router.post("/addproduct", upload.single('image'), addProducts);
 router.get("/getproducts", getProducts);
 router.put("/updateproduct", upload.single('image'), updateProduct);
 router.delete("/deleteproducts", deleteProduct);
-
+router.post("/addproduct",)
 module.exports = router;

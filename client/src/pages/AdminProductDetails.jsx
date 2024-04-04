@@ -16,14 +16,11 @@ import { deleteProductRoute } from "../utils/APIRoutes";
 
 export default function AdminProductDetails() {
   const navigate = useNavigate();
-  const handleLogout = () => {
-    navigate("/login");
-  };
   const [products, setProducts] = useState([]);
   const [currentProductId, setCurrentProductId] = useState("");
   // Functionality for adding product started
   const [showModal, setShowModal] = useState(false);
-  const [product, setProduct] = useState({ status: "Availability" });
+  const [product, setProduct] = useState({});
   const handleClose = () => setShowModal(false);
   const handleShow = () => setShowModal(true);
 
@@ -36,21 +33,25 @@ export default function AdminProductDetails() {
     zIndex: 9999,
   };
   const validateForm = () => {
-    const { productNumber, productName, price, status, image } = product;
-    if (productNumber === "") {
+    const { productNumber, productName, price, status, image, description } =
+      product;
+    if (!productNumber) {
       toast.error("Product number is required.", toastOptions);
       return false;
-    } else if (productName === "") {
+    } else if (!productName) {
       toast.error("Product Name is required.", toastOptions);
       return false;
-    } else if (image === "") {
+    } else if (!image) {
       toast.error("Image is required.", toastOptions);
       return false;
-    } else if (status === "") {
+    } else if (!status) {
       toast.error("Status is required.", toastOptions);
       return false;
-    } else if (price === "") {
+    } else if (!price) {
       toast.error("Price is required.", toastOptions);
+      return false;
+    } else if (!description) {
+      toast.error("Description is required.", toastOptions);
       return false;
     }
     toast.success("Data saved successfully");
@@ -59,15 +60,9 @@ export default function AdminProductDetails() {
 
   const handleSubmit = async (event) => {
     if (validateForm()) {
-      const {
-        productNumber,
-        productName,
-        price,
-        status,
-        image,
-        description,
-        features,
-      } = product;
+      console.log("handling adding product");
+      const { productNumber, productName, price, status, image, description } =
+        product;
       const formData = new FormData();
 
       formData.append("productNumber", productNumber);
@@ -76,7 +71,6 @@ export default function AdminProductDetails() {
       formData.append("status", status);
       formData.append("image", image);
       formData.append("description", description);
-      formData.append("features", features);
       console.log("Form Data in admin product fe", formData);
       const { data } = await axios.post(productRoute, formData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -107,10 +101,9 @@ export default function AdminProductDetails() {
 
   const updateStatus = (status) => {
     console.log("status updated to ", status);
-    const productinside = { ...product, status: status };
+    const productinside = { ...product, status };
     console.log("product inside update status ", productinside);
-    setProduct(productinside);
-    console.log("product after status update ", product);
+    setProduct({ productinside });
   };
 
   const showUpdateProduct = async (product) => {
@@ -124,44 +117,48 @@ export default function AdminProductDetails() {
   }, []);
 
   const handleUpdate = async (e) => {
-    e.preventDefault();
-    const {
-      productNumber,
-      productName,
-      price,
-      status,
-      image,
-      description,
-      features,
-    } = product;
-    const formData = new FormData();
-    const featuresString = Array.isArray(features) ? features.join(",") : "";
+    // e.preventDefault();
+    if (validateForm()) {
+      const { productNumber, productName, price, status, image, description } =
+        product;
+      console.log("status during update ", status);
+      const formData = new FormData();
+      // const featuresString = Array.isArray(features) ? features.join(",") : "";
 
-    const featuresArray = featuresString
-      .split(",")
-      .map((feature) => feature.trim());
+      // const featuresArray = featuresString
+      //   .split(",")
+      //   .map((feature) => feature.trim());
 
-    featuresArray.forEach((feature, index) => {
-      formData.append(`features[${index}]`, feature);
-    });
+      // featuresArray.forEach((feature, index) => {
+      //   formData.append(`features[${index}]`, feature);
+      // });
 
-    formData.append("productNumber", productNumber);
-    formData.append("productName", productName);
-    formData.append("price", price);
-    formData.append("status", status);
-    formData.append("image", image);
-    formData.append("description", description || "");
-    formData.append("_id", currentProductId);
-    console.log("updated product ", formData);
-    try {
-      const result = await axios.put(updateProductRoute, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      console.log("results ", result);
-    } catch (e) {
-      console.log("error ", e);
+      formData.append("productNumber", productNumber);
+      formData.append("productName", productName);
+      formData.append("price", price);
+      formData.append("status", status);
+      formData.append("image", image);
+      formData.append("description", description || "");
+      formData.append("_id", currentProductId);
+      console.log("updated product ", formData);
+      try {
+        const result = await axios.put(updateProductRoute, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        setProduct({
+          productNumber: result.data.productNumber,
+          productName: result.data.productName,
+          price: result.data.price,
+          status: result.data.status,
+          image: result.data.image,
+          description: result.data.description,
+        });
+        console.log("results ", result);
+      } catch (e) {
+        console.log("error ", e);
+      }
+      setShowModal(false);
     }
-    setShowModal(false);
   };
 
   const getProducts = async () => {
@@ -235,6 +232,7 @@ export default function AdminProductDetails() {
                       <Form.Label>Price</Form.Label>
                       <Form.Control
                         type="number"
+                        placeholder="Price in $CAD"
                         value={product.price}
                         onChange={(e) =>
                           setProduct({
@@ -257,19 +255,7 @@ export default function AdminProductDetails() {
                         }
                       />
                     </Form.Group>
-                    <Form.Group controlId="features">
-                      <Form.Label>Product Features</Form.Label>
-                      <Form.Control
-                        type="text"
-                        value={product.features}
-                        onChange={(e) =>
-                          setProduct({
-                            ...product,
-                            features: e.target.value,
-                          })
-                        }
-                      />
-                    </Form.Group>
+
                     <Form.Group
                       style={{ marginTop: "10px" }}
                       controlId="status"

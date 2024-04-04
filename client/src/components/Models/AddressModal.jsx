@@ -1,49 +1,155 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { Form } from "react-bootstrap";
 import styled from "styled-components";
+import axios from "axios";
 
+import { ToastContainer, toast } from "react-toastify";
+import { addUserAddressRoute } from "../../utils/APIRoutes";
 const AddressModal = ({ isOpen, onClose, headerText }) => {
+  const [address, setAddress] = useState({ id: "", username: "" });
+  useEffect(() => {
+    const storedUserData = JSON.parse(
+      localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
+    );
+    if (storedUserData && storedUserData._id) {
+      setAddress((prevData) => ({
+        ...prevData,
+        id: storedUserData._id,
+        username: storedUserData.username,
+      }));
+    }
+  }, []);
+  const toastOptions = {
+    position: "bottom-right",
+    autoClose: 8000,
+    pauseOnHover: true,
+    draggable: true,
+    theme: "dark",
+    zIndex: 9999,
+  };
+  const validateForm = () => {
+    const { phoneNumber, street, city, state, pincode } = address;
+    console.log("address in validate form", address);
+    if (phoneNumber === "") {
+      toast.error("Product number is required.", toastOptions);
+      return false;
+    } else if (street === "") {
+      toast.error("Product Name is required.", toastOptions);
+      return false;
+    } else if (city === "") {
+      toast.error("Image is required.", toastOptions);
+      return false;
+    } else if (state === "") {
+      toast.error("Status is required.", toastOptions);
+      return false;
+    } else if (pincode === "") {
+      toast.error("Price is required.", toastOptions);
+      return false;
+    }
+    toast.success("Data saved successfully");
+    return true;
+  };
+  const handleSubmitAddress = async (e) => {
+    // e.preventDefault();
+
+    try {
+      if (validateForm()) {
+        console.log("address in addres model -", address);
+        const { data } = await axios.post(addUserAddressRoute, address);
+        console.log("Data---", data.data);
+
+        if (data.status === true) {
+          console.log("Data in address --", data.data);
+          localStorage.setItem(
+            process.env.REACT_APP_LOCALHOST_KEY,
+            JSON.stringify(data.data)
+          );
+        }
+        // alert("Form data saved successfully");
+      }
+    } catch (error) {
+      console.error("Error saving form data:", error);
+      alert("Error saving form data. Please try again later.");
+    }
+  };
   return (
     <>
       {isOpen && (
         <ModalBackground onClick={onClose}>
           <ModalContent onClick={(e) => e.stopPropagation()}>
             <Header>{headerText}</Header>
-            <Form>
-              <FormGroup>
-                <Row>
-                  <Label>Phone No:</Label>
-                  <Input type="text" />
-                </Row>
-              </FormGroup>
-              <FormGroup>
-                <Row>
-                  <Label>Street:</Label>
-                  <Input type="text" />
-                </Row>
-              </FormGroup>
-              <FormGroup>
-                <Row>
-                  <Label>City:</Label>
-                  <Input type="text" />
-                </Row>
-              </FormGroup>
-              <FormGroup>
-                <Row>
-                  <Label>State:</Label>
-                  <Input type="text" />
-                </Row>
-              </FormGroup>
-              <FormGroup>
-                <Row>
-                  <Label>Pincode:</Label>
-                  <Input type="text" />
-                </Row>
-              </FormGroup>
+            <Form onSubmit={handleSubmitAddress}>
+              <Form.Group controlId="phoneNumber">
+                <Form.Label>Phone Number: </Form.Label>
+                <Form.Control
+                  type="number"
+                  value={address.phoneNumber}
+                  onChange={(e) =>
+                    setAddress({
+                      ...address,
+                      phoneNumber: e.target.value,
+                    })
+                  }
+                />
+              </Form.Group>
+              <Form.Group controlId="street">
+                <Form.Label>Street:</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={address.street}
+                  onChange={(e) =>
+                    setAddress({
+                      ...address,
+                      street: e.target.value,
+                    })
+                  }
+                />
+              </Form.Group>
+              <Form.Group controlId="city">
+                <Form.Label>City: </Form.Label>
+                <Form.Control
+                  type="text"
+                  value={address.city}
+                  onChange={(e) =>
+                    setAddress({
+                      ...address,
+                      city: e.target.value,
+                    })
+                  }
+                />
+              </Form.Group>
+              <Form.Group controlId="state">
+                <Form.Label>State:</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={address.state}
+                  onChange={(e) =>
+                    setAddress({
+                      ...address,
+                      state: e.target.value,
+                    })
+                  }
+                />
+              </Form.Group>
+              <Form.Group controlId="pincode">
+                <Form.Label>Pincode:</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={address.pincode}
+                  onChange={(e) =>
+                    setAddress({
+                      ...address,
+                      pincode: e.target.value,
+                    })
+                  }
+                />
+              </Form.Group>
               <SaveButton>Save</SaveButton>
             </Form>
           </ModalContent>
         </ModalBackground>
       )}
+      <ToastContainer />
     </>
   );
 };
@@ -73,33 +179,6 @@ const Header = styled.h2`
   color: white;
   padding: 1rem; /* Add padding for better visual appearance */
   border-radius: 8px; /* Add border-radius to match the modal content */
-`;
-
-const Form = styled.form`
-  width: 100%;
-`;
-
-const FormGroup = styled.div`
-  margin-bottom: 1rem;
-`;
-
-const Row = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const Label = styled.label`
-  font-size: 1rem;
-  font-weight: bold;
-  width: 120px; /* Fixed width for the label */
-`;
-
-const Input = styled.input`
-  padding: 0.5rem;
-  font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  flex: 1; /* Grow to fill remaining space */
 `;
 
 const SaveButton = styled.button`

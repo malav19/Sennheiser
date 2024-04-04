@@ -1,5 +1,7 @@
 export const host = "http://localhost:8081";
+export const updateUserRoute = `${host}/api/auth/updateUser`;
 export const loginRoute = `${host}/api/auth/login`;
+export const addUserAddressRoute = `${host}/api/auth/addingAddress`;
 export const registerRoute = `${host}/api/auth/register`;
 export const dashboardRoute = `${host}/api/auth/dashboard`;
 export const resetPasswordRoute = "/api/reset-password";
@@ -9,3 +11,4 @@ export const updateProductRoute = `${host}/api/product/updateproduct`;
 export const recieveProductRoute = `${host}/api/product/getproducts`;
 export const deleteProductRoute = `${host}/api/product/deleteproducts`;
 export const orderRoute = `${host}/api/order/addOrder`;
+export const contactFormRoute = `${host}/api/contact-form`;
